@@ -22,15 +22,6 @@ Explication rapide de la gestion des utilisateurs, sécurité, et permissions.
 ## Logging
 Présentation de l’intégration avec Sentry ou autres outils de journalisation.
 
-## Documentation
-- https://www.postgresql.org/
-- https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-22-04
-- https://www.pgadmin.org/
-- https://www.postgresql.org/ftp/pgadmin/pgadmin4/v9.8/windows/
-- https://docs.sqlalchemy.org/en/20/orm/
-- https://docs.sqlalchemy.org/en/20/core/engines.html
-- https://docs.sqlalchemy.org/en/20/dialects/postgresql.html
-
 
 ## Author
 This project was developed by Magnott in October 2025 as part of the Python Application Developer program at OpenClassrooms.

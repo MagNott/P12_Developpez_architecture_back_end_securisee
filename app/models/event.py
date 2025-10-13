@@ -1,10 +1,10 @@
-from db import Base
+from db import BaseModel
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy import Date
 from sqlalchemy.orm import relationship
 
 
-class Event(Base):
+class Event(BaseModel):
     __tablename__ = "events"
 
     id = Column(Integer, primary_key=True)

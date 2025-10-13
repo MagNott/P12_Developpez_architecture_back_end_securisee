@@ -1,8 +1,8 @@
-from db import Base
+from db import BaseModel
 from sqlalchemy import Column, String
 
 
-class User(Base):
+class User(BaseModel):
     __abstract__ = True  # This class won't be mapped to a table
 
     first_name = Column(String(50), nullable=False)

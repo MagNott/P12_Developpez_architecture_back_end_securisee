@@ -1,9 +1,9 @@
-from db import Base
+from db import BaseModel
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 
-class Department(Base):
+class Department(BaseModel):
     __tablename__ = "departments"
 
     id = Column(Integer, primary_key=True)

@@ -1,0 +1,25 @@
+from sqlalchemy.orm import DeclarativeBase
+from db import SessionLocal
+
+
+def commit_to_db(model_instance: DeclarativeBase) -> bool:
+    """
+    Add and commit an instance to the database, with automatic session
+    handling.
+
+    Returns:
+        True if the commit was successful, False otherwise.
+    """
+    session = SessionLocal()
+    try:
+        session.add(model_instance)
+        session.commit()
+        return True
+    except Exception as e:
+        # Even if no explicit transaction seems to have started,
+        # rollback prevents issues if something was implicitly flushed.
+        session.rollback()
+        print(f"Error committing to database: {e}")
+        return False
+    finally:
+        session.close()

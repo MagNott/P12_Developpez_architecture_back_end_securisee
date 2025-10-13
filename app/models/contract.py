@@ -1,10 +1,10 @@
-from db import Base
+from db import BaseModel
 from sqlalchemy import Column, Float, ForeignKey, Integer
 from sqlalchemy import Date
 from sqlalchemy.orm import relationship
 
 
-class Contract(Base):
+class Contract(BaseModel):
     __tablename__ = "contracts"
 
     id = Column(Integer, primary_key=True)

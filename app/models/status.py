@@ -1,9 +1,9 @@
-from db import Base
+from db import BaseModel
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 
-class Status(Base):
+class Status(BaseModel):
     __tablename__ = "statuses"
 
     id = Column(Integer, primary_key=True)

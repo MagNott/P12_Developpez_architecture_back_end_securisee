@@ -7,12 +7,12 @@ def action_main_menu():
         action = render_main_menu()
 
         if action == SIGNIN:
-            from app.controllers.auth_controller import signin
+            from app.controllers.collaborator_controller import signin
             signin()
         elif action == SIGNUP:
-            from app.controllers.auth_controller import signup
+            from app.controllers.collaborator_controller import signup
             signup()
         elif action == LOGOUT:
-            from app.controllers.auth_controller import logout
+            from app.controllers.collaborator_controller import logout
             logout()
             break

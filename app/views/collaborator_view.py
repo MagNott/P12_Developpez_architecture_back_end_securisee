@@ -45,3 +45,12 @@ def show_signup_success():
 
 def show_signup_error():
     console.print("[bold red]Error during sign up. Try again.[/bold red]")
+
+
+def show_signin_success(collaborator_found):
+    console.print("[bold green]Sign in successful![/bold green]")
+    console.print(f"Welcome back, {collaborator_found.first_name} {collaborator_found.last_name}!")
+
+
+def show_signin_error():
+    console.print("[bold red]Error during sign in. Check your login and password.[/bold red]")

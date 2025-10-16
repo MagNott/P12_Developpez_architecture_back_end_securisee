@@ -7,7 +7,7 @@ from app.views.collaborator_input_view import (
     ask_email,
     ask_phone_number,
     ask_login,
-    ask_password
+    ask_password,
 )
 
 
@@ -27,11 +27,11 @@ def get_signup_info() -> dict:
     dict_info_user["password"] = ask_password()
 
     departments = get_departments()
-    department_choices = [f"{dept['id']}: {dept['name']}"
-                          for dept in departments]
+    department_choices = [
+        f"{dept['id']}: {dept['name']}" for dept in departments
+    ]
     department_choice = questionary.select(
-        "Select your department:",
-        choices=department_choices
+        "Select your department:", choices=department_choices
     ).ask()
     dict_info_user["department_id"] = int(department_choice.split(":")[0])
     # need to convert to int because questionary returns a string
@@ -49,8 +49,12 @@ def show_signup_error():
 
 def show_signin_success(collaborator_found):
     console.print("[bold green]Sign in successful![/bold green]")
-    console.print(f"Welcome back, {collaborator_found.first_name} {collaborator_found.last_name}!")
+    console.print(
+        f"Welcome back, {collaborator_found.first_name} {collaborator_found.last_name}!"
+    )
 
 
 def show_signin_error():
-    console.print("[bold red]Error during sign in. Check your login and password.[/bold red]")
+    console.print(
+        "[bold red]Error during sign in. Check your login and password.[/bold red]"
+    )

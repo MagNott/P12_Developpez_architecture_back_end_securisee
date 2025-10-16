@@ -10,9 +10,7 @@ class Collaborator(User):
     login = Column(String(20), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
     department_id = Column(
-        Integer,
-        ForeignKey("departments.id"),
-        nullable=False
+        Integer, ForeignKey("departments.id"), nullable=False
     )
 
     # Establish relationship with Department

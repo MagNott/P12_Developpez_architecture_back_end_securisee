@@ -1,0 +1,97 @@
+from app.utils.session_utils import (
+    get_authenticated_department,
+    is_authenticated,
+)
+from app.utils.constants import MANAGEMENT, SALES, SUPPORT
+
+
+class Permission:
+    def __init__(self):
+        self.authenticated_collaborator = is_authenticated()
+        self.department = (
+            get_authenticated_department()
+            if self.authenticated_collaborator
+            else None
+        )
+
+    def is_collaborator_authenticated(self):
+        return self.authenticated_collaborator is not False
+
+    def can_read(self):
+        # All authenticated collaborators can read any data
+        # (customers, contracts, events, etc.)
+        return self.is_collaborator_authenticated()
+
+    def can_create_contract(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == MANAGEMENT
+        )
+
+    def can_modify_contract(self):
+        return self.is_collaborator_authenticated() and self.department in [
+            MANAGEMENT,
+            SALES,
+        ]
+
+    def can_modify_collaborator(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == MANAGEMENT
+        )
+
+    def can_delete_collaborator(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == MANAGEMENT
+        )
+
+    def can_view_events_without_support_collaborator(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == MANAGEMENT
+        )
+
+    def can_assign_collaborator_to_event(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == MANAGEMENT
+        )
+
+    def can_create_event(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == SALES
+        )
+
+    def can_create_customer(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == SALES
+        )
+
+    def can_modify_customer(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == SALES
+        )
+
+    def can_display_my_events(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == SUPPORT
+        )
+
+    def can_update_my_events(self):
+        return (
+            self.is_collaborator_authenticated()
+            and self.department == SUPPORT
+        )
+
+
+# SIGNUP ?
+    # def can_create_collaborator(self):
+        # return (
+        #     self.is_collaborator_authenticated()
+        #     and self.department == MANAGEMENT
+        # )

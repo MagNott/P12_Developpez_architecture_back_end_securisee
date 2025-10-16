@@ -5,7 +5,7 @@ from app.validators.collaborator_validators import (
     is_valid_email,
     is_valid_phone_number,
     is_valid_login,
-    is_valid_password
+    is_valid_password,
 )
 
 console = Console()

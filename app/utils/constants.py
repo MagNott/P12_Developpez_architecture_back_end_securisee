@@ -1,3 +1,28 @@
 SIGNIN = "Sign in"
 SIGNUP = "Sign up"
 LOGOUT = "Log out"
+
+MANAGEMENT = "Management"
+SUPPORT = "Support"
+SALES = "Sales"
+
+CREATE_CONTRACT = "Create Contract"
+VIEW_CONTRACTS = "View Contracts"
+MODIFY_CONTRACT = "Modify Contract"
+CREATE_COLLABORATOR = "Create Collaborator"
+MODIFY_COLLABORATOR = "Modify Collaborator"
+DELETE_COLLABORATOR = "Delete Collaborator"
+EVENT_WITHOUT_SUPPORT_COLLABORATOR = "Event without support"
+ASSIGN_COLLABORATOR_TO_EVENT = "Assign collaborator to event"
+
+DISPLAY_MY_EVENTS = "Display my events"
+UPDATE_MY_EVENTS = "Update my events"
+
+CREATE_CUSTOMER = "Create customer"
+READ_EVENT = "Read event"
+VIEW_CUSTOMERS = "View customers"
+READ_CUSTOMER = "Read customers"
+READ_CONTRACT = "Read contract"
+MODIFY_CUSTOMER = "Modify customer"
+MODIFY_CONTRACT = "Modify contract"
+CREATE_EVENT = "Create event"

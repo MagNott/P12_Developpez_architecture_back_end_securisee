@@ -3,7 +3,7 @@ from app.views.collaborator_view import (
     show_signin_success,
     show_signin_error,
     show_signup_success,
-    show_signup_error
+    show_signup_error,
 )
 from app.models.collaborator import Collaborator
 from app.utils.password_utils import hash_password
@@ -12,6 +12,7 @@ from app.utils.collaborator_utils import find_collaborator_by_login
 from app.utils.password_utils import verify_password
 from app.views.collaborator_input_view import ask_login, ask_password
 from app.utils.session_utils import generate_token, save_token
+from app.permissions.permission import Permission
 
 
 def signup():
@@ -25,7 +26,7 @@ def signup():
         phone_number=user_info["phone_number"],
         login=user_info["login"],
         password=hashed_password,
-        department_id=user_info["department_id"]
+        department_id=user_info["department_id"],
     )
 
     if commit_to_db(collaborator):
@@ -41,15 +42,32 @@ def signin():
     user_password_clear = ask_password()
 
     if collaborator_found and verify_password(
-        user_password_clear,
-        str(collaborator_found.password)
+        user_password_clear, str(collaborator_found.password)
     ):
         token = generate_token(collaborator_found)
         save_token(token)
         show_signin_success(collaborator_found)
+
+        from app.controllers.menu_controller import department_menu
+        # to avoid circular import
+        department_menu()
     else:
         show_signin_error()
 
 
 def logout():
     print("Log out function called")
+
+# did signup do that ?
+# def create_collaborator():
+#     print("[Collaborator Controller] create_collaborator() called")
+
+
+def modify_collaborator():
+    print("[Collaborator Controller] modify_collaborator() called")
+
+
+def delete_collaborator():
+    permission = Permission()
+    if permission.can_delete_collaborator():
+        print("[Collaborator Controller] delete_collaborator() called")

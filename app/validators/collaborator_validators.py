@@ -11,7 +11,7 @@ def is_valid_last_name(last_name) -> bool:
 
 def is_valid_email(email: str) -> bool:
     email = email.strip()
-    pattern = r'^[\w\.-]+@[\w\.-]+\.\w{2,}$'
+    pattern = r"^[\w\.-]+@[\w\.-]+\.\w{2,}$"
     return re.match(pattern, email) is not None
 
 

@@ -15,9 +15,7 @@ class Event(BaseModel):
     end_date = Column(Date, nullable=False)
     contract_id = Column(Integer, ForeignKey("contracts.id"), nullable=False)
     collaborator_id = Column(
-        Integer,
-        ForeignKey("collaborators.id"),
-        nullable=False
+        Integer, ForeignKey("collaborators.id"), nullable=False
     )
 
     # Establish relationship with other models

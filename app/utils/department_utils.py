@@ -3,6 +3,11 @@ from db import SessionLocal
 
 
 def get_departments() -> list[dict]:
+    """
+    Fetch all departments from the database
+
+    Returns a list of dictionaries with department id and name
+    """
     session = SessionLocal()
     try:
         departments = session.query(Department).all()

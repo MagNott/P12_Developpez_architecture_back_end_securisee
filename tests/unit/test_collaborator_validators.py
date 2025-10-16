@@ -5,7 +5,7 @@ from app.validators.collaborator_validators import (
     is_valid_email,
     is_valid_phone_number,
     is_valid_login,
-    is_valid_password
+    is_valid_password,
 )
 
 
@@ -15,7 +15,7 @@ def test_first_name_should_be_valid_when_normal_string():
 
 @pytest.mark.parametrize("first_name", ["", "   "])
 def test_first_name_should_be_not_valid_when_empty_string_or_whitespace(
-    first_name
+    first_name,
 ):
     assert is_valid_first_name(first_name) is False
 
@@ -26,7 +26,7 @@ def test_last_name_should_be_valid_when_normal_string():
 
 @pytest.mark.parametrize("last_name", ["", "   "])
 def test_last_name_should_be_not_valid_when_empty_string_or_whitespace(
-    last_name
+    last_name,
 ):
     assert is_valid_last_name(last_name) is False
 
@@ -45,8 +45,7 @@ def test_phone_number_should_be_valid_when_10_digits():
 
 
 @pytest.mark.parametrize(
-        "phone_number",
-        ["012345678", "01234567890", "01234abcde"]
+    "phone_number", ["012345678", "01234567890", "01234abcde"]
 )
 def test_phone_number_should_be_not_valid(phone_number):
     assert is_valid_phone_number(phone_number) is False
@@ -67,6 +66,6 @@ def test_password_should_be_valid_when_normal_string():
 
 @pytest.mark.parametrize("password", ["", "   "])
 def test_password_should_be_not_valid_when_empty_string_or_whitespace(
-    password
+    password,
 ):
     assert is_valid_password(password) is False

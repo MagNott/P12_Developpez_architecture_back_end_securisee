@@ -11,10 +11,8 @@ class Customer(User):
     company_name = Column(String(100), nullable=False)
     creation_date = Column(Date)
     last_update = Column(Date)
-    commercial_id = Column(
-        Integer,
-        ForeignKey("collaborators.id"),
-        nullable=False
+    SALES_id = Column(
+        Integer, ForeignKey("collaborators.id"), nullable=False
     )
 
     # Establish relationship with other models

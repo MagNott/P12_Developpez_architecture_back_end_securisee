@@ -1,5 +1,5 @@
 from app.models.collaborator import Collaborator
-from db import SessionLocal
+from db import Session
 
 
 def find_collaborator_by_login(user_login: str) -> Collaborator | None:
@@ -8,7 +8,8 @@ def find_collaborator_by_login(user_login: str) -> Collaborator | None:
 
     Returns the Collaborator object if found, None otherwise.
     """
-    session = SessionLocal()
+    session = Session()
+
     collaborator_found = (
         session.query(Collaborator).filter_by(login=user_login).first()
     )

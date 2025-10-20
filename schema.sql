@@ -6,13 +6,13 @@ CREATE TABLE customers (
 	company_name VARCHAR(100) NOT NULL, 
 	creation_date DATE, 
 	last_update DATE, 
-	SALES_id INTEGER NOT NULL, 
+	commercial_id INTEGER NOT NULL, 
 	first_name VARCHAR(50) NOT NULL, 
 	last_name VARCHAR(50) NOT NULL, 
 	mail VARCHAR NOT NULL, 
 	phone_number VARCHAR(15) NOT NULL, 
 	PRIMARY KEY (id), 
-	FOREIGN KEY(SALES_id) REFERENCES collaborators (id), 
+	FOREIGN KEY(commercial_id) REFERENCES collaborators (id), 
 	UNIQUE (mail)
 )
 

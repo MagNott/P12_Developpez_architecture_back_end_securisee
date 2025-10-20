@@ -8,6 +8,7 @@ from app.utils.constants import (
     DISPLAY_MY_EVENTS,
     EVENT_WITHOUT_SUPPORT_COLLABORATOR,
     MODIFY_CUSTOMER,
+    READ_CUSTOMER,
     SIGNIN,
     SIGNUP,
     LOGOUT,
@@ -39,6 +40,7 @@ def render_management_menu():
         choices=[
             CREATE_CONTRACT,
             MODIFY_CONTRACT,
+            VIEW_CUSTOMERS,
             MODIFY_COLLABORATOR,
             DELETE_COLLABORATOR,
             EVENT_WITHOUT_SUPPORT_COLLABORATOR,
@@ -53,7 +55,7 @@ def render_support_menu():
     console.print(Panel("[bold cyan]Support Menu[/bold cyan]", expand=False))
     choice = questionary.select(
         "Make a choice:",
-        choices=[DISPLAY_MY_EVENTS, UPDATE_MY_EVENTS, LOGOUT],
+        choices=[DISPLAY_MY_EVENTS, UPDATE_MY_EVENTS, VIEW_CUSTOMERS, LOGOUT],
     ).ask()
     return choice
 
@@ -65,6 +67,7 @@ def render_sales_menu():
         choices=[
             CREATE_CUSTOMER,
             VIEW_CUSTOMERS,
+            READ_CUSTOMER,
             MODIFY_CUSTOMER,
             MODIFY_CONTRACT,
             CREATE_EVENT,

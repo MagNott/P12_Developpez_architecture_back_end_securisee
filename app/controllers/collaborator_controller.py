@@ -13,46 +13,60 @@ from app.utils.password_utils import verify_password
 from app.views.collaborator_input_view import ask_login, ask_password
 from app.utils.session_utils import generate_token, save_token
 from app.permissions.permission import Permission
+from db import Session
 
 
 def signup():
-    user_info = get_signup_info()
-    hashed_password = hash_password(user_info["password"])
+    session = Session()
 
-    collaborator = Collaborator(
-        first_name=user_info["first_name"],
-        last_name=user_info["last_name"],
-        mail=user_info["email"],
-        phone_number=user_info["phone_number"],
-        login=user_info["login"],
-        password=hashed_password,
-        department_id=user_info["department_id"],
-    )
+    try:
+        user_info = get_signup_info()
+        hashed_password = hash_password(user_info["password"])
 
-    if commit_to_db(collaborator):
-        show_signup_success()
-    else:
-        show_signup_error()
+        collaborator = Collaborator(
+            first_name=user_info["first_name"],
+            last_name=user_info["last_name"],
+            mail=user_info["email"],
+            phone_number=user_info["phone_number"],
+            login=user_info["login"],
+            password=hashed_password,
+            department_id=user_info["department_id"],
+        )
+
+        if commit_to_db(session, collaborator):
+            show_signup_success()
+        else:
+            show_signup_error()
+    finally:
+        session.close()
+        Session.remove()
 
 
 def signin():
-    user_login = ask_login()
-    collaborator_found = find_collaborator_by_login(user_login)
+    session = Session()
 
-    user_password_clear = ask_password()
+    try:
+        user_login = ask_login()
+        collaborator_found = find_collaborator_by_login(user_login)
 
-    if collaborator_found and verify_password(
-        user_password_clear, str(collaborator_found.password)
-    ):
-        token = generate_token(collaborator_found)
-        save_token(token)
-        show_signin_success(collaborator_found)
+        user_password_clear = ask_password()
 
-        from app.controllers.menu_controller import department_menu
-        # to avoid circular import
-        department_menu()
-    else:
-        show_signin_error()
+        if collaborator_found and verify_password(
+            user_password_clear, str(collaborator_found.password)
+        ):
+            token = generate_token(collaborator_found)
+            save_token(token)
+            show_signin_success(collaborator_found)
+
+            from app.controllers.menu_controller import department_menu
+            # to avoid circular import
+            department_menu()
+        else:
+            show_signin_error()
+
+    finally:
+        session.close()
+        Session.remove()
 
 
 def logout():

@@ -22,7 +22,7 @@ from app.utils.constants import (ASSIGN_COLLABORATOR_TO_EVENT,
                                  MODIFY_CONTRACT,
                                  MODIFY_CUSTOMER,
                                  SIGNIN, SIGNUP, SUPPORT,
-                                 UPDATE_MY_EVENTS)
+                                 UPDATE_MY_EVENTS, VIEW_CUSTOMERS)
 from app.utils.session_utils import get_authenticated_department
 from app.controllers.collaborator_controller import signin, signup, logout
 from app.controllers.contract_controller import (
@@ -30,11 +30,7 @@ from app.controllers.contract_controller import (
     modify_contract,
     read_contract
 )
-from app.controllers.customer_controller import (
-    create_customer,
-    modify_customer,
-    read_customer
-)
+from app.controllers.customer_controller import CustomerController
 from app.controllers.collaborator_controller import (
     modify_collaborator,
     delete_collaborator,
@@ -84,9 +80,17 @@ def action_sales_menu():
     while True:
         action = render_sales_menu()
         if action == CREATE_CUSTOMER and permission.can_create_customer():
-            create_customer()
+            customer_controller = CustomerController()
+            customer_controller.create_customer()
+        elif action == VIEW_CUSTOMERS and permission.can_read():
+            customer_controller = CustomerController()
+            customer_controller.view_customers()
+        elif action == READ_CUSTOMER and permission.can_read():
+            customer_controller = CustomerController()
+            customer_controller.read_customer()
         elif action == MODIFY_CUSTOMER and permission.can_modify_customer():
-            modify_customer()
+            customer_controller = CustomerController()
+            customer_controller.modify_customer()
         elif action == CREATE_EVENT and permission.can_create_event():
             create_event()
         elif action == READ_EVENT and permission.can_read():
@@ -109,6 +113,9 @@ def action_management_menu():
             create_contract()
         elif action == MODIFY_CONTRACT and permission.can_modify_contract():
             modify_contract()
+        elif action == VIEW_CUSTOMERS and permission.can_read():
+            customer_controller = CustomerController()
+            customer_controller.view_customers()
         elif (
             action == MODIFY_COLLABORATOR
             and permission.can_modify_collaborator()
@@ -142,7 +149,9 @@ def action_support_menu():
         if action == DISPLAY_MY_EVENTS and permission.can_display_my_events():
             from app.controllers.event_controller import display_my_events
             display_my_events()
-
+        elif action == VIEW_CUSTOMERS and permission.can_read():
+            customer_controller = CustomerController()
+            customer_controller.view_customers()
         elif action == UPDATE_MY_EVENTS and permission.can_update_my_events():
             from app.controllers.event_controller import update_my_events
 

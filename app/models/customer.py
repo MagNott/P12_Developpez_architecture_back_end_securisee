@@ -11,7 +11,7 @@ class Customer(User):
     company_name = Column(String(100), nullable=False)
     creation_date = Column(Date)
     last_update = Column(Date)
-    SALES_id = Column(
+    commercial_id = Column(
         Integer, ForeignKey("collaborators.id"), nullable=False
     )
 

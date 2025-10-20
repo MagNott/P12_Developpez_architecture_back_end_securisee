@@ -1,5 +1,5 @@
 from app.models.department import Department
-from db import SessionLocal
+from db import Session
 
 
 def get_departments() -> list[dict]:
@@ -8,7 +8,7 @@ def get_departments() -> list[dict]:
 
     Returns a list of dictionaries with department id and name
     """
-    session = SessionLocal()
+    session = Session()
     try:
         departments = session.query(Department).all()
         return [{"id": d.id, "name": d.name} for d in departments]

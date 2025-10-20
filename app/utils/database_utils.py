@@ -1,16 +1,13 @@
 from sqlalchemy.orm import DeclarativeBase
-from db import SessionLocal
 
 
-def commit_to_db(model_instance: DeclarativeBase) -> bool:
+def commit_to_db(session, model_instance: DeclarativeBase) -> bool:
     """
-    Add and commit an instance to the database, with automatic session
-    handling.
+    Add and commit an instance to the database
 
     Returns:
-        True if the commit was successful, False otherwise.
+        True if the commit was successful, False otherwise
     """
-    session = SessionLocal()
     try:
         session.add(model_instance)
         session.commit()
@@ -21,5 +18,3 @@ def commit_to_db(model_instance: DeclarativeBase) -> bool:
         session.rollback()
         print(f"Error committing to database: {e}")
         return False
-    finally:
-        session.close()

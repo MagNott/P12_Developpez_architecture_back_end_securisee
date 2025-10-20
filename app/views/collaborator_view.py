@@ -1,20 +1,19 @@
 from rich.console import Console
 import questionary
 from app.utils.department_utils import get_departments
-from app.views.collaborator_input_view import (
+from app.views.user_input_view import (
     ask_first_name,
     ask_last_name,
     ask_email,
-    ask_phone_number,
+    ask_phone_number)
+from app.views.collaborator_input_view import (
     ask_login,
     ask_password,
 )
 
 
-console = Console()
-
-
 def get_signup_info() -> dict:
+    console = Console()
     console.print("[bold green]Sign Up[/bold green]")
 
     dict_info_user = {}
@@ -40,14 +39,17 @@ def get_signup_info() -> dict:
 
 
 def show_signup_success():
+    console = Console()
     console.print("[bold green]Sign up successful![/bold green]")
 
 
 def show_signup_error():
+    console = Console()
     console.print("[bold red]Error during sign up. Try again.[/bold red]")
 
 
 def show_signin_success(collaborator_found):
+    console = Console()
     console.print("[bold green]Sign in successful![/bold green]")
     console.print(
         f"Welcome back, {collaborator_found.first_name} {collaborator_found.last_name}!"
@@ -55,6 +57,7 @@ def show_signin_success(collaborator_found):
 
 
 def show_signin_error():
+    console = Console()
     console.print(
         "[bold red]Error during sign in. Check your login and password.[/bold red]"
     )

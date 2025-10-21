@@ -33,7 +33,8 @@ def test_create_customer_success(
 ):
 
     patch_can_create = patch.object(
-        customer_controller.permission, "can_create_customer", return_value=True
+        customer_controller.permission, "can_create_customer",
+        return_value=True
     )
 
     patch_session = patch(

@@ -31,7 +31,7 @@ def ask_if_update(field_name: str, current_value: str) -> bool:
     return answer == "y"
 
 
-def ask_commercial_change(sales_collaborators: list[Collaborator]) -> int | None:
+def ask_sales_collaborator_change(sales_collaborators: list[Collaborator]) -> int | None:
     sales_choices = [
         f"{sales_collaborator.id}: \
         {sales_collaborator.first_name} {sales_collaborator.last_name}"
@@ -70,8 +70,10 @@ def ask_customer_modification(
         customer_updated["company_name"] = ask_company_name()
 
     if ask_if_update("commercial", current_commercial_name):
-        new_commercial_id = ask_commercial_change(sales_collaborators)
-        if new_commercial_id:
-            customer_updated["commercial_id"] = new_commercial_id
+        new_sales_collaborator_id = ask_sales_collaborator_change(
+            sales_collaborators
+        )
+        if new_sales_collaborator_id:
+            customer_updated["commercial_id"] = new_sales_collaborator_id
 
     return customer_updated

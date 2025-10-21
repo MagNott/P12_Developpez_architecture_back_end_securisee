@@ -7,7 +7,12 @@ from unittest.mock import mock_open, patch, MagicMock  # noqa: E402
 from app.models.collaborator import Collaborator  # noqa: E402
 from app.models.department import Department  # noqa: E402
 from app.models.customer import Customer  # noqa: E402
+from app.models.contract import Contract  # noqa: E402
+from app.models.status import Status  # noqa: E402
 from app.controllers.customer_controller import CustomerController  # noqa: E402
+from app.controllers.contract_controller import ContractController  # noqa: E402
+
+sys.path.append(str(Path(__file__).parent.parent))
 
 
 @pytest.fixture
@@ -36,6 +41,13 @@ def mock_query(fake_collaborator):
 @pytest.fixture
 def customer_controller(fake_authenticated_collaborator):
     controller = CustomerController()
+    controller.authenticated_collaborator = fake_authenticated_collaborator
+    return controller
+
+
+@pytest.fixture
+def contract_controller(fake_authenticated_collaborator):
+    controller = ContractController()
     controller.authenticated_collaborator = fake_authenticated_collaborator
     return controller
 
@@ -221,4 +233,49 @@ def fake_customer_info() -> dict:
         "email": "jean.durand@example.com",
         "phone_number": "0707070707",
         "company_name": "Durand SARL",
+    }
+
+
+@pytest.fixture
+def fake_contracts(fake_customers) -> list[Contract]:
+    today = datetime.date.today()
+
+    status_pending = Status(id=1, name="Pending")
+    status_signed = Status(id=2, name="Signed")
+    status_unsigned = Status(id=3, name="Unsigned")
+
+    return [
+        Contract(
+            id=1,
+            contract_amount=1500.0,
+            amount_due=1500.0,
+            creation_date=today,
+            customer=fake_customers[0],
+            status=status_pending,
+        ),
+        Contract(
+            id=2,
+            contract_amount=2500.0,
+            amount_due=1000.0,
+            creation_date=today,
+            customer=fake_customers[1],
+            status=status_signed,
+        ),
+        Contract(
+            id=3,
+            contract_amount=3000.0,
+            amount_due=0.0,
+            creation_date=today,
+            customer=fake_customers[0],
+            status=status_unsigned,
+        ),
+    ]
+
+
+@pytest.fixture
+def fake_contract_info() -> dict:
+    return {
+        "contract_amount": 2500.0,
+        "amount_due": 1500.0,
+        "status_id": 1,  # Pending
     }

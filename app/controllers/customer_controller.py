@@ -141,6 +141,7 @@ class CustomerController:
             if not customer_updated:
                 return
 
+            # Apply updates to the customer object
             for key, value in customer_updated.items():
                 setattr(customer_object, key, value)
             customer_object.last_update = datetime.datetime.now().date()  # type: ignore

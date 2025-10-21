@@ -8,6 +8,7 @@ from app.utils.constants import (
     DISPLAY_MY_EVENTS,
     EVENT_WITHOUT_SUPPORT_COLLABORATOR,
     MODIFY_CUSTOMER,
+    READ_CONTRACT,
     READ_CUSTOMER,
     SIGNIN,
     SIGNUP,
@@ -17,6 +18,7 @@ from app.utils.constants import (
     MODIFY_CONTRACT,
     MODIFY_COLLABORATOR,
     DELETE_COLLABORATOR,
+    VIEW_CONTRACTS,
     VIEW_CUSTOMERS,
 )
 
@@ -34,10 +36,15 @@ def render_main_menu():
 
 
 def render_management_menu():
-    console.print(Panel("[bold cyan]Management Menu[/bold cyan]", expand=False))
+    console.print(Panel(
+        "[bold cyan]Management Menu[/bold cyan]",
+        expand=False
+    ))
     choice = questionary.select(
         "Make a choice:",
         choices=[
+            VIEW_CONTRACTS,
+            READ_CONTRACT,
             CREATE_CONTRACT,
             MODIFY_CONTRACT,
             VIEW_CUSTOMERS,
@@ -55,7 +62,14 @@ def render_support_menu():
     console.print(Panel("[bold cyan]Support Menu[/bold cyan]", expand=False))
     choice = questionary.select(
         "Make a choice:",
-        choices=[DISPLAY_MY_EVENTS, UPDATE_MY_EVENTS, VIEW_CUSTOMERS, LOGOUT],
+        choices=[
+            VIEW_CONTRACTS,
+            READ_CONTRACT,
+            DISPLAY_MY_EVENTS,
+            UPDATE_MY_EVENTS,
+            VIEW_CUSTOMERS,
+            LOGOUT
+        ],
     ).ask()
     return choice
 
@@ -68,6 +82,8 @@ def render_sales_menu():
             CREATE_CUSTOMER,
             VIEW_CUSTOMERS,
             READ_CUSTOMER,
+            VIEW_CONTRACTS,
+            READ_CONTRACT,
             MODIFY_CUSTOMER,
             MODIFY_CONTRACT,
             CREATE_EVENT,

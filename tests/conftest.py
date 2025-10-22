@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 import datetime
+from datetime import date
 sys.path.append(str(Path(__file__).parent.parent))
 import pytest  # noqa: E402
 from unittest.mock import mock_open, patch, MagicMock  # noqa: E402
@@ -11,6 +12,8 @@ from app.models.contract import Contract  # noqa: E402
 from app.models.status import Status  # noqa: E402
 from app.controllers.customer_controller import CustomerController  # noqa: E402
 from app.controllers.contract_controller import ContractController  # noqa: E402
+from app.models.event import Event  # noqa: E402
+from app.controllers.event_controller import EventController  # noqa: E402
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -51,6 +54,9 @@ def contract_controller(fake_authenticated_collaborator):
     controller.authenticated_collaborator = fake_authenticated_collaborator
     return controller
 
+@pytest.fixture
+def event_controller():
+    return EventController()
 
 @pytest.fixture
 def mock_get_signup_info(fake_collaborator_info):
@@ -278,4 +284,59 @@ def fake_contract_info() -> dict:
         "contract_amount": 2500.0,
         "amount_due": 1500.0,
         "status_id": 1,  # Pending
+    }
+
+
+@pytest.fixture
+def fake_events(fake_contracts, fake_collaborators) -> list[Event]:
+    return [
+        Event(
+            id=1,
+            location="Paris",
+            attendees=50,
+            notes="Tech Conference",
+            start_date=date(2025, 11, 1),
+            end_date=date(2025, 11, 3),
+            contract_id=fake_contracts[0].id,
+            contract=fake_contracts[0],
+            collaborator_id=fake_collaborators[0].id,
+            collaborator=fake_collaborators[0],
+        ),
+        Event(
+            id=2,
+            location="Lyon",
+            attendees=30,
+            notes="Annual Meetup",
+            start_date=date(2025, 12, 5),
+            end_date=date(2025, 12, 6),
+            contract_id=fake_contracts[1].id,
+            contract=fake_contracts[1],
+            collaborator_id=fake_collaborators[1].id,
+            collaborator=fake_collaborators[1],
+        ),
+        Event(
+            id=3,
+            location="Marseille",
+            attendees=20,
+            notes="Client Workshop",
+            start_date=date(2025, 12, 10),
+            end_date=date(2025, 12, 11),
+            contract_id=fake_contracts[2].id,
+            contract=fake_contracts[2],
+            collaborator_id=fake_collaborators[2].id,
+            collaborator=fake_collaborators[2],
+        ),
+    ]
+
+
+@pytest.fixture
+def fake_event_info(fake_contracts, fake_collaborators) -> dict:
+    return {
+        "location": "Toulouse",
+        "attendees": 15,
+        "notes": "Internal Seminar",
+        "start_date": date(2025, 11, 20),
+        "end_date": date(2025, 11, 21),
+        "contract_id": fake_contracts[0].id,
+        "collaborator_id": fake_collaborators[0].id,
     }

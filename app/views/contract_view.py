@@ -15,6 +15,11 @@ def get_contract_info() -> dict:
 
     dict_contract["contract_amount"] = ask_contract_amount()
     dict_contract["amount_due"] = ask_contract_amount_due()
+    while not dict_contract["amount_due"] <= dict_contract["contract_amount"]:
+        console.print(
+            "[red]Amount due must be less than or equal to contract amount.[/red]"
+        )
+        dict_contract["amount_due"] = ask_contract_amount_due()
 
     statuses = get_statuses()
     status_choices = [f"{status['id']}: {status['name']}" for status in statuses]

@@ -5,7 +5,8 @@ from app.views.menu_view import (
     render_support_menu,
 )
 from app.views.menu_view import render_access_denied
-from app.utils.constants import (ASSIGN_COLLABORATOR_TO_EVENT,
+from app.utils.constants import (ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
+                                 MODIFY_EVENT,
                                  SALES,
                                  CREATE_CONTRACT,
                                  READ_CUSTOMER,
@@ -22,6 +23,7 @@ from app.utils.constants import (ASSIGN_COLLABORATOR_TO_EVENT,
                                  MODIFY_COLLABORATOR,
                                  MODIFY_CONTRACT,
                                  MODIFY_CUSTOMER,
+                                 VIEW_EVENTS,
                                  SIGNIN, SIGNUP, SUPPORT,
                                  UPDATE_MY_EVENTS, VIEW_CUSTOMERS)
 from app.utils.session_utils import get_authenticated_department
@@ -32,12 +34,7 @@ from app.controllers.collaborator_controller import (
     modify_collaborator,
     delete_collaborator,
 )
-from app.controllers.event_controller import (
-    create_event,
-    event_without_support_collaborator,
-    assign_collaborator_to_event,
-    read_event
-)
+from app.controllers.event_controller import EventController
 from app.permissions.permission import Permission
 
 
@@ -72,110 +69,109 @@ def department_menu():
 
 
 def action_sales_menu():
-    permission = Permission()
-
     while True:
         action = render_sales_menu()
-        if action == CREATE_CUSTOMER and permission.can_create_customer():
+        if action == CREATE_CUSTOMER:
             customer_controller = CustomerController()
             customer_controller.create_customer()
-        elif action == VIEW_CUSTOMERS and permission.can_read():
+        elif action == VIEW_CUSTOMERS:
             customer_controller = CustomerController()
             customer_controller.view_customers()
-        elif action == READ_CUSTOMER and permission.can_read():
+        elif action == READ_CUSTOMER:
             customer_controller = CustomerController()
             customer_controller.read_customer()
-        elif action == MODIFY_CUSTOMER and permission.can_modify_customer():
+        elif action == MODIFY_CUSTOMER:
             customer_controller = CustomerController()
             customer_controller.modify_customer()
-        elif action == VIEW_CONTRACTS and permission.can_read():
+        elif action == VIEW_CONTRACTS:
             contract_controller = ContractController()
             contract_controller.view_contracts()
-        elif action == READ_CONTRACT and permission.can_read():
+        elif action == READ_CONTRACT:
             contract_controller = ContractController()
             contract_controller.read_contract()
-        elif action == MODIFY_CONTRACT and permission.can_modify_contract():
+        elif action == MODIFY_CONTRACT:
             contract_controller = ContractController()
             contract_controller.modify_contract()
-        elif action == CREATE_EVENT and permission.can_create_event():
-            create_event()
-        elif action == READ_EVENT and permission.can_read():
-            read_event()
-        elif action == READ_CUSTOMER and permission.can_read():
-            read_customer()
-        elif action == READ_CONTRACT and permission.can_read():
-            read_contract()
+        elif action == VIEW_EVENTS:
+            event_controller = EventController()
+            event_controller.view_events()
+        elif action == CREATE_EVENT:
+            event_controller = EventController()
+            event_controller.create_event()
+        elif action == READ_EVENT:
+            event_controller = EventController()
+            event_controller.read_event()
         elif action == LOGOUT:
             logout()
             break
 
 
 def action_management_menu():
-    permission = Permission()
     while True:
         action = render_management_menu()
 
-        if action == CREATE_CONTRACT and permission.can_create_contract():
+        if action == CREATE_CONTRACT:
             contract_controller = ContractController()
             contract_controller.create_contract()
-        elif action == VIEW_CONTRACTS and permission.can_read():
+        elif action == VIEW_CONTRACTS:
             contract_controller = ContractController()
             contract_controller.view_contracts()
-        elif action == READ_CONTRACT and permission.can_read():
+        elif action == READ_CONTRACT:
             contract_controller = ContractController()
             contract_controller.read_contract()
-        elif action == MODIFY_CONTRACT and permission.can_modify_contract():
+        elif action == MODIFY_CONTRACT:
             contract_controller = ContractController()
             contract_controller.modify_contract()
-        elif action == VIEW_CUSTOMERS and permission.can_read():
+        elif action == VIEW_EVENTS:
+            event_controller = EventController()
+            event_controller.view_events()
+        elif action == READ_EVENT:
+            event_controller = EventController()
+            event_controller.read_event()
+        elif action == ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT:
+            event_controller = EventController()
+            event_controller.assign_support_collaborator_to_event()
+        elif action == VIEW_CUSTOMERS:
             customer_controller = CustomerController()
             customer_controller.view_customers()
         elif (
             action == MODIFY_COLLABORATOR
-            and permission.can_modify_collaborator()
         ):
             modify_collaborator()
         elif (
             action == DELETE_COLLABORATOR
-            and permission.can_delete_collaborator()
         ):
             delete_collaborator()
-        elif (
-            action == EVENT_WITHOUT_SUPPORT_COLLABORATOR
-            and permission.can_view_events_without_support_collaborator()
-        ):
-            event_without_support_collaborator()
-        elif (
-            action == ASSIGN_COLLABORATOR_TO_EVENT
-            and permission.can_assign_collaborator_to_event()
-        ):
-            assign_collaborator_to_event()
         elif action == LOGOUT:
             logout()
             break
 
 
 def action_support_menu():
-    permission = Permission()
     while True:
         action = render_support_menu()
 
-        if action == DISPLAY_MY_EVENTS and permission.can_display_my_events():
-            from app.controllers.event_controller import display_my_events
-            display_my_events()
-        elif action == VIEW_CONTRACTS and permission.can_read():
+        if action == DISPLAY_MY_EVENTS:
+            event_controller = EventController()
+            event_controller.display_my_events()
+        elif action == VIEW_CONTRACTS:
             contract_controller = ContractController()
             contract_controller.view_contracts()
-        elif action == READ_CONTRACT and permission.can_read():
+        elif action == READ_CONTRACT:
             contract_controller = ContractController()
             contract_controller.read_contract()
-        elif action == VIEW_CUSTOMERS and permission.can_read():
+        elif action == VIEW_CUSTOMERS:
             customer_controller = CustomerController()
             customer_controller.view_customers()
-        elif action == UPDATE_MY_EVENTS and permission.can_update_my_events():
-            from app.controllers.event_controller import update_my_events
-
-            update_my_events()
+        elif action == VIEW_EVENTS:
+            event_controller = EventController()
+            event_controller.view_events()
+        elif action == READ_EVENT:
+            event_controller = EventController()
+            event_controller.read_event()
+        elif action == MODIFY_EVENT:
+            event_controller = EventController()
+            event_controller.modify_event()
         elif action == LOGOUT:
             from app.controllers.collaborator_controller import logout
 

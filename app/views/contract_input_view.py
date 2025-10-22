@@ -5,35 +5,28 @@ from app.models.status import Status
 from app.views.customer_input_view import ask_if_update
 import questionary
 
+from app.validators.contract_validators import (
+    is_valid_contract_amount,
+    is_valid_contract_amount_due
+)
 
 console = Console()
 
 
 def ask_contract_amount() -> float:
     while True:
-        try:
-            amount_str = console.input("Enter contract amount: ")
-            amount = float(amount_str)
-            if amount < 0:
-                console.print("[red]Amount must be non-negative.[/red]")
-            else:
-                return amount
-        except ValueError:
-            console.print("[red]Invalid input. Please enter a numeric value.[/red]")
+        amount_str = console.input("Enter contract amount: ")
+        if is_valid_contract_amount(amount_str):
+            return float(amount_str)
+        console.print("[red]Amount must be non-negative.[/red]")
 
 
 def ask_contract_amount_due() -> float:
     while True:
-        try:
-            amount_due_str = console.input("Enter contract amount due: ")
-            amount_due = float(amount_due_str)
-            if amount_due < 0:
-                console.print("[red]Amount due must be non-negative.[/red]")
-            else:
-                return amount_due
-
-        except ValueError:
-            console.print("[red]Invalid input. Please enter a numeric value.[/red]")
+        amount_due_str = console.input("Enter contract amount due: ")
+        if is_valid_contract_amount_due(amount_due_str):
+            return float(amount_due_str)
+        console.print("[red]Amount due must be non-negative.[/red]")
 
 
 def ask_status_change(statuses: list[dict]) -> int | None:

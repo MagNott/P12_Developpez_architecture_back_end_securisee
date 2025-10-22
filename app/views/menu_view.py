@@ -2,14 +2,16 @@ from rich.console import Console
 from rich.panel import Panel
 import questionary
 from app.utils.constants import (
-    ASSIGN_COLLABORATOR_TO_EVENT,
+    ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
     CREATE_CUSTOMER,
     CREATE_EVENT,
     DISPLAY_MY_EVENTS,
     EVENT_WITHOUT_SUPPORT_COLLABORATOR,
     MODIFY_CUSTOMER,
+    MODIFY_EVENT,
     READ_CONTRACT,
     READ_CUSTOMER,
+    READ_EVENT,
     SIGNIN,
     SIGNUP,
     LOGOUT,
@@ -20,6 +22,7 @@ from app.utils.constants import (
     DELETE_COLLABORATOR,
     VIEW_CONTRACTS,
     VIEW_CUSTOMERS,
+    VIEW_EVENTS,
 )
 
 console = Console()
@@ -49,9 +52,11 @@ def render_management_menu():
             MODIFY_CONTRACT,
             VIEW_CUSTOMERS,
             MODIFY_COLLABORATOR,
+            VIEW_EVENTS,
+            READ_EVENT,
             DELETE_COLLABORATOR,
             EVENT_WITHOUT_SUPPORT_COLLABORATOR,
-            ASSIGN_COLLABORATOR_TO_EVENT,
+            ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
             LOGOUT,
         ],
     ).ask()
@@ -65,6 +70,9 @@ def render_support_menu():
         choices=[
             VIEW_CONTRACTS,
             READ_CONTRACT,
+            READ_EVENT,
+            VIEW_EVENTS,
+            MODIFY_EVENT,
             DISPLAY_MY_EVENTS,
             UPDATE_MY_EVENTS,
             VIEW_CUSTOMERS,
@@ -86,6 +94,8 @@ def render_sales_menu():
             READ_CONTRACT,
             MODIFY_CUSTOMER,
             MODIFY_CONTRACT,
+            VIEW_EVENTS,
+            READ_EVENT,
             CREATE_EVENT,
             LOGOUT,
         ],

@@ -65,6 +65,18 @@ class Permission:
             and self.department == SALES
         )
 
+    def can_modify_event(self):
+        return bool(
+            self.is_collaborator_authenticated()
+            and self.department == SUPPORT
+        )
+
+    def can_display_my_events(self):
+        return bool(
+            self.is_collaborator_authenticated()
+            and self.department == SUPPORT
+        )
+
     def can_create_customer(self) -> bool:
         return bool(self.is_collaborator_authenticated()
                     and self.department == SALES)
@@ -73,16 +85,10 @@ class Permission:
         return bool(self.is_collaborator_authenticated()
                     and self.department == SALES)
 
-    def can_display_my_events(self):
+    def can_assign_support_collaborator_to_event(self):
         return bool(
             self.is_collaborator_authenticated()
-            and self.department == SUPPORT
-        )
-
-    def can_update_my_events(self):
-        return bool(
-            self.is_collaborator_authenticated()
-            and self.department == SUPPORT
+            and self.department == MANAGEMENT
         )
 
 

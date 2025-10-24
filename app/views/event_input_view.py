@@ -5,7 +5,7 @@ from app.validators.event_validator import (
     is_valid_location,
     is_valid_notes
 )
-from app.views.customer_input_view import ask_if_update
+from app.views.common_input_view import ask_if_update
 
 console = Console()
 

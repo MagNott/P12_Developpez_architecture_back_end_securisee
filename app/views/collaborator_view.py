@@ -38,6 +38,28 @@ def get_signup_info() -> dict:
     return dict_info_user
 
 
+def render_choice_collaborator(collaborators):
+    console = Console()
+    console.print("[bold blue]Select a Collaborator[/bold blue]")
+
+    if not collaborators:
+        console.print("[bold red]No collaborators available.[/bold red]")
+        return None
+
+    collaborator_choices = [
+        f"{collab.id}: {collab.first_name} {collab.last_name}"
+        for collab in collaborators
+    ]
+    collaborator_choice = questionary.select(
+        "Choose a collaborator:", choices=collaborator_choices
+    ).ask()
+
+    if collaborator_choice is None:
+        return None
+
+    return collaborator_choice
+
+
 def show_signup_success():
     console = Console()
     console.print("[bold green]Sign up successful![/bold green]")
@@ -60,4 +82,19 @@ def show_signin_error():
     console = Console()
     console.print(
         "[bold red]Error during sign in. Check your login and password.[/bold red]"
+    )
+
+
+def show_error_commiting_to_db(e):
+    console = Console()
+    console.print(
+        "[bold red]Error committing to the database. Please try again.[/bold red]"
+    )
+    console.print(f"[red]Details: {e}[/red]")
+
+
+def show_cannot_delete_self():
+    console = Console()
+    console.print(
+        "[bold red]You cannot delete your own account.[/bold red]"
     )

@@ -3,10 +3,10 @@ from rich.panel import Panel
 import questionary
 from app.utils.constants import (
     ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
+    CREATE_COLLABORATOR,
     CREATE_CUSTOMER,
     CREATE_EVENT,
     DISPLAY_MY_EVENTS,
-    EVENT_WITHOUT_SUPPORT_COLLABORATOR,
     MODIFY_CUSTOMER,
     MODIFY_EVENT,
     READ_CONTRACT,
@@ -46,16 +46,17 @@ def render_management_menu():
     choice = questionary.select(
         "Make a choice:",
         choices=[
+            CREATE_COLLABORATOR,
+            MODIFY_COLLABORATOR,
+            DELETE_COLLABORATOR,
+            VIEW_CUSTOMERS,
+            READ_CUSTOMER,
             VIEW_CONTRACTS,
             READ_CONTRACT,
             CREATE_CONTRACT,
             MODIFY_CONTRACT,
-            VIEW_CUSTOMERS,
-            MODIFY_COLLABORATOR,
             VIEW_EVENTS,
             READ_EVENT,
-            DELETE_COLLABORATOR,
-            EVENT_WITHOUT_SUPPORT_COLLABORATOR,
             ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
             LOGOUT,
         ],
@@ -68,14 +69,15 @@ def render_support_menu():
     choice = questionary.select(
         "Make a choice:",
         choices=[
+            VIEW_CUSTOMERS,
+            READ_CUSTOMER,
             VIEW_CONTRACTS,
             READ_CONTRACT,
-            READ_EVENT,
             VIEW_EVENTS,
+            READ_EVENT,
             MODIFY_EVENT,
             DISPLAY_MY_EVENTS,
             UPDATE_MY_EVENTS,
-            VIEW_CUSTOMERS,
             LOGOUT
         ],
     ).ask()
@@ -90,9 +92,9 @@ def render_sales_menu():
             CREATE_CUSTOMER,
             VIEW_CUSTOMERS,
             READ_CUSTOMER,
+            MODIFY_CUSTOMER,
             VIEW_CONTRACTS,
             READ_CONTRACT,
-            MODIFY_CUSTOMER,
             MODIFY_CONTRACT,
             VIEW_EVENTS,
             READ_EVENT,

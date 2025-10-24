@@ -44,10 +44,9 @@ def test_get_authenticated_department_no_auth(mock_is_authenticated_no_auth):
 
 def test_is_authenticated_success(mock_file, mock_query, fake_collaborator):
     token = generate_token(fake_collaborator)
-    with patch(
-        "builtins.open",
-        mock_open(read_data=token),
-    ):
+    with patch("builtins.open", mock_open(read_data=token)), \
+         patch("app.utils.session_utils.find_collaborator_by_login",
+               return_value=fake_collaborator):
         result = is_authenticated()
 
     assert result is not False

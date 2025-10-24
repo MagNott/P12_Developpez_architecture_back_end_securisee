@@ -1,3 +1,4 @@
+from app.models.customer import Customer
 from app.utils.session_utils import (
     get_authenticated_department,
     is_authenticated,
@@ -36,6 +37,12 @@ class Permission:
         ]
 
     def can_modify_collaborator(self):
+        return bool(
+            self.is_collaborator_authenticated()
+            and self.department == MANAGEMENT
+        )
+
+    def can_create_collaborator(self):
         return bool(
             self.is_collaborator_authenticated()
             and self.department == MANAGEMENT
@@ -90,11 +97,3 @@ class Permission:
             self.is_collaborator_authenticated()
             and self.department == MANAGEMENT
         )
-
-
-# SIGNUP ?
-    # def can_create_collaborator(self):
-        # return (
-        #     self.is_collaborator_authenticated()
-        #     and self.department == MANAGEMENT
-        # )

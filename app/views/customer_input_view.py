@@ -10,6 +10,7 @@ from app.views.user_input_view import (
     ask_email,
     ask_phone_number,
 )
+from app.views.common_input_view import ask_if_update
 import questionary
 
 
@@ -20,15 +21,6 @@ def ask_company_name() -> str:
         if is_valid_company_name(company_name):
             return company_name
         console.print("[red]Company name cannot be empty[/red]")
-
-
-def ask_if_update(field_name: str, current_value: str) -> bool:
-    console = Console()
-    console.print(f"Current {field_name}: {current_value}")
-    answer = input(f"Modify {field_name}? (y/N): ").lower()
-    # Default to 'N' if the user just presses Enter because it's not y
-
-    return answer == "y"
 
 
 def ask_sales_collaborator_change(sales_collaborators: list[Collaborator]) -> int | None:

@@ -14,8 +14,7 @@ from app.controllers.customer_controller import CustomerController  # noqa: E402
 from app.controllers.contract_controller import ContractController  # noqa: E402
 from app.models.event import Event  # noqa: E402
 from app.controllers.event_controller import EventController  # noqa: E402
-
-sys.path.append(str(Path(__file__).parent.parent))
+from app.controllers.collaborator_controller import CollaboratorController  # noqa: E402
 
 
 @pytest.fixture
@@ -49,14 +48,23 @@ def customer_controller(fake_authenticated_collaborator):
 
 
 @pytest.fixture
+def collaborator_controller(fake_authenticated_collaborator):
+    controller = CollaboratorController()
+    controller.authenticated_collaborator = fake_authenticated_collaborator
+    return controller
+
+
+@pytest.fixture
 def contract_controller(fake_authenticated_collaborator):
     controller = ContractController()
     controller.authenticated_collaborator = fake_authenticated_collaborator
     return controller
 
+
 @pytest.fixture
 def event_controller():
     return EventController()
+
 
 @pytest.fixture
 def mock_get_signup_info(fake_collaborator_info):
@@ -129,6 +137,20 @@ def fake_collaborator() -> Collaborator:
     )
     # Adding a department object to avoid AttributeError in tests
     return fake_collaborator
+
+
+@pytest.fixture
+def fake_collaborator_to_delete():
+    return Collaborator(
+        id=2,
+        first_name="Jean",
+        last_name="Dupont",
+        login="JDupont",
+        password="hashed",
+        mail="jean@example.com",
+        department_id=1,
+        department=Department(id=1, name="Support"),
+    )
 
 
 @pytest.fixture

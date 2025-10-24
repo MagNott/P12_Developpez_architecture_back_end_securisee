@@ -1,8 +1,8 @@
 from unittest.mock import patch
-from app.controllers import collaborator_controller
 
 
 def test_signup_success(
+        collaborator_controller,
         mock_session,
         mock_get_signup_info,
         fake_collaborator_info
@@ -22,6 +22,7 @@ def test_signup_success(
 
 
 def test_signup_failure(mock_session,
+                        collaborator_controller,
                         mock_get_signup_info,
                         fake_collaborator_info):
     mock_session.commit.side_effect = Exception("DB Error")
@@ -40,6 +41,7 @@ def test_signup_failure(mock_session,
 
 
 def test_signin_success(
+    collaborator_controller,
     mock_session,
     mock_query,
     mock_ask_login,
@@ -66,7 +68,7 @@ def test_signin_success(
 
 
 def test_signin_failure_wrong_login(
-    mock_session, mock_ask_login, mock_ask_password
+    collaborator_controller, mock_session, mock_ask_login, mock_ask_password
 ):
 
     with patch(
@@ -86,6 +88,7 @@ def test_signin_failure_wrong_login(
 
 
 def test_signin_failure_wrong_password(
+    collaborator_controller,
     mock_session,
     mock_query,
     mock_ask_login,
@@ -105,3 +108,106 @@ def test_signin_failure_wrong_password(
 
     mock_show_signin_success.assert_not_called()
     mock_show_signin_error.assert_called_once()
+
+
+def test_create_collaborator_success(
+    collaborator_controller,
+    mock_session,
+    mock_query,
+    mock_get_signup_info,
+):
+
+    patch_session = patch(
+        "app.controllers.collaborator_controller.Session",
+        return_value=mock_session
+    )
+
+    patch_choice = patch(
+        "app.controllers.collaborator_controller.render_choice_collaborator",
+        return_value="1",
+    )
+    patch_commit = patch(
+        "app.controllers.collaborator_controller.commit_to_db", return_value=True
+    )
+    patch_show_success = patch(
+        "app.controllers.collaborator_controller.show_signup_success"
+    )
+    patch_show_error = patch(
+        "app.controllers.collaborator_controller.show_signup_error"
+    )
+
+    with patch_session, patch_choice, patch_commit, \
+         patch_show_success as mock_show_success, patch_show_error as mock_show_error:
+        collaborator_controller.create_collaborator()
+
+    mock_show_error.assert_not_called()
+
+
+def test_modify_collaborator_success(
+    collaborator_controller,
+    mock_session,
+    mock_query,
+    fake_collaborator_info,
+):
+
+    patch_session = patch(
+        "app.controllers.collaborator_controller.Session",
+        return_value=mock_session
+    )
+
+    patch_choice = patch(
+        "app.controllers.collaborator_controller.render_choice_collaborator",
+        return_value="1",
+    )
+    patch_ask_modify = patch(
+        "app.controllers.collaborator_controller.ask_collaborator_modification",
+        return_value=fake_collaborator_info
+    )
+    patch_commit = patch(
+        "app.controllers.collaborator_controller.commit_to_db",
+        return_value=True
+    )
+    patch_show_success = patch(
+        "app.controllers.collaborator_controller.show_signup_success"
+    )
+    patch_show_error = patch(
+        "app.controllers.collaborator_controller.show_signup_error"
+    )
+
+    with patch_session, patch_choice, patch_commit, patch_ask_modify, \
+         patch_show_success as mock_show_success, patch_show_error as mock_show_error:
+        collaborator_controller.modify_collaborator()
+    mock_show_error.assert_not_called()
+
+
+def test_delete_collaborator_success(
+    collaborator_controller,
+    mock_session,
+    mock_query,
+    mock_is_authenticated_management,
+    fake_collaborator,
+    fake_collaborator_to_delete,
+):
+
+    patch_session = patch(
+        "app.controllers.collaborator_controller.Session",
+        return_value=mock_session
+    )
+    patch_choice = patch(
+        "app.controllers.collaborator_controller.render_choice_collaborator",
+        return_value=f"{fake_collaborator_to_delete.id}: Dupont Jean",
+    )
+    patch_show_success = patch(
+        "app.controllers.collaborator_controller.show_signup_success"
+    )
+    patch_show_error = patch(
+        "app.controllers.collaborator_controller.show_signup_error"
+    )
+
+    mock_session.query().filter().first.return_value = fake_collaborator_to_delete
+
+    with patch_session, patch_choice, \
+         patch_show_success as mock_show_success, patch_show_error as mock_show_error:
+        collaborator_controller.delete_collaborator()
+
+    mock_show_error.assert_not_called()

@@ -1,3 +1,4 @@
+import app.controllers
 from app.views.menu_view import (
     render_sales_menu,
     render_management_menu,
@@ -6,6 +7,7 @@ from app.views.menu_view import (
 )
 from app.views.menu_view import render_access_denied
 from app.utils.constants import (ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
+                                 CREATE_COLLABORATOR,
                                  MODIFY_EVENT,
                                  SALES,
                                  CREATE_CONTRACT,
@@ -16,7 +18,6 @@ from app.utils.constants import (ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
                                  CREATE_EVENT,
                                  DELETE_COLLABORATOR,
                                  DISPLAY_MY_EVENTS,
-                                 EVENT_WITHOUT_SUPPORT_COLLABORATOR,
                                  MANAGEMENT,
                                  LOGOUT,
                                  VIEW_CONTRACTS,
@@ -25,29 +26,26 @@ from app.utils.constants import (ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
                                  MODIFY_CUSTOMER,
                                  VIEW_EVENTS,
                                  SIGNIN, SIGNUP, SUPPORT,
-                                 UPDATE_MY_EVENTS, VIEW_CUSTOMERS)
+                                 VIEW_CUSTOMERS)
 from app.utils.session_utils import get_authenticated_department
-from app.controllers.collaborator_controller import signin, signup, logout
 from app.controllers.contract_controller import ContractController
 from app.controllers.customer_controller import CustomerController
-from app.controllers.collaborator_controller import (
-    modify_collaborator,
-    delete_collaborator,
-)
+from app.controllers.collaborator_controller import CollaboratorController
 from app.controllers.event_controller import EventController
-from app.permissions.permission import Permission
-
 
 def action_main_menu():
     while True:
         action = render_main_menu()
 
         if action == SIGNIN:
-            signin()
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.signin()
         elif action == SIGNUP:
-            signup()
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.signup()
         elif action == LOGOUT:
-            logout()
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.logout()
             break
 
 
@@ -102,7 +100,8 @@ def action_sales_menu():
             event_controller = EventController()
             event_controller.read_event()
         elif action == LOGOUT:
-            logout()
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.logout()
             break
 
 
@@ -134,16 +133,18 @@ def action_management_menu():
         elif action == VIEW_CUSTOMERS:
             customer_controller = CustomerController()
             customer_controller.view_customers()
-        elif (
-            action == MODIFY_COLLABORATOR
-        ):
-            modify_collaborator()
-        elif (
-            action == DELETE_COLLABORATOR
-        ):
-            delete_collaborator()
+        elif action == CREATE_COLLABORATOR:
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.create_collaborator()
+        elif action == MODIFY_COLLABORATOR:
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.modify_collaborator()
+        elif action == DELETE_COLLABORATOR:
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.delete_collaborator()
         elif action == LOGOUT:
-            logout()
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.logout()
             break
 
 
@@ -173,7 +174,6 @@ def action_support_menu():
             event_controller = EventController()
             event_controller.modify_event()
         elif action == LOGOUT:
-            from app.controllers.collaborator_controller import logout
-
-            logout()
+            collaborator_controller = CollaboratorController()
+            collaborator_controller.logout()
             break

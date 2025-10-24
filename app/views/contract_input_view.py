@@ -2,7 +2,7 @@ from rich.console import Console
 
 from app.models.contract import Contract
 from app.models.status import Status
-from app.views.customer_input_view import ask_if_update
+from app.views.common_input_view import ask_if_update
 import questionary
 
 from app.validators.contract_validators import (

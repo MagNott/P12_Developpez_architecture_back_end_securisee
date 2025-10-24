@@ -116,6 +116,10 @@ class CustomerController:
             if not customer_object:
                 return
 
+            if customer_object.commercial_id != self.authenticated_collaborator.id:  # type: ignore
+                render_access_denied()
+                return
+
             current_sales_collaborator = (
                 session.query(Collaborator)
                 .filter(Collaborator.id == customer_object.commercial_id)

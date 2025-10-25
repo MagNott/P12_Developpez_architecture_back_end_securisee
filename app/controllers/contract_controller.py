@@ -21,6 +21,7 @@ from app.views.contract_input_view import (
     ask_contract_modification,
 )
 from app.utils.database_utils import commit_to_db
+from app.utils.constants import MANAGEMENT
 
 
 class ContractController:
@@ -37,7 +38,10 @@ class ContractController:
 
         try:
             contracts = session.query(Contract).all()
-            render_view_all_contracts(contracts)
+            render_view_all_contracts(
+                contracts,
+                self.authenticated_collaborator
+            )
 
         finally:
             session.close()
@@ -51,7 +55,7 @@ class ContractController:
         session = Session()
 
         try:
-            contract_info = get_contract_info()
+            contract_info = get_contract_info(self.authenticated_collaborator)
 
             customer_list = session.query(Customer).all()
             customer_contract_choice = render_choice_customer(customer_list)
@@ -95,7 +99,10 @@ class ContractController:
         try:
             contracts = session.query(Contract).all()
 
-            contract_choice = render_choice_contract(contracts)
+            contract_choice = render_choice_contract(
+                contracts,
+                self.authenticated_collaborator
+            )
             if not contract_choice:
                 return
 
@@ -107,7 +114,10 @@ class ContractController:
             if not contract_object:
                 return
 
-            render_read_contract(contract_object)
+            render_read_contract(
+                contract_object,
+                self.authenticated_collaborator
+            )
 
         finally:
             session.close()
@@ -122,7 +132,10 @@ class ContractController:
         try:
             contracts = session.query(Contract).all()
 
-            contract_choice = render_choice_contract(contracts)
+            contract_choice = render_choice_contract(
+                contracts,
+                self.authenticated_collaborator
+            )
             if not contract_choice:
                 return
 
@@ -142,6 +155,11 @@ class ContractController:
                 .first()
             )
             if not current_status:
+                return
+
+            # Only commercial collaborator can modify their own customers
+            if not (self.department == MANAGEMENT or contract_object.customer.commercial_id != self.authenticated_collaborator.id):  # type: ignore
+                render_access_denied()
                 return
 
             contract_updated = ask_contract_modification(

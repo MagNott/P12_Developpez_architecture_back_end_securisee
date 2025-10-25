@@ -16,7 +16,6 @@ from app.utils.constants import (
     SIGNUP,
     LOGOUT,
     CREATE_CONTRACT,
-    UPDATE_MY_EVENTS,
     MODIFY_CONTRACT,
     MODIFY_COLLABORATOR,
     DELETE_COLLABORATOR,
@@ -77,7 +76,6 @@ def render_support_menu():
             READ_EVENT,
             MODIFY_EVENT,
             DISPLAY_MY_EVENTS,
-            UPDATE_MY_EVENTS,
             LOGOUT
         ],
     ).ask()

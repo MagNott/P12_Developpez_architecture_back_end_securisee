@@ -2,14 +2,15 @@ import questionary
 from rich.console import Console
 from rich.panel import Panel
 
+from app.models.collaborator import Collaborator
 from app.utils.status_utils import get_statuses
 from app.views.contract_input_view import (ask_contract_amount,
                                            ask_contract_amount_due)
 
 
-def get_contract_info() -> dict:
+def get_contract_info(connected_collaborator: Collaborator) -> dict:
     console = Console()
-    console.print("[bold green]Create a contract[/bold green]")
+    console.print(f"[bold green]Create a contract for {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold green]")
 
     dict_contract = {}
 
@@ -33,11 +34,11 @@ def get_contract_info() -> dict:
     return dict_contract
 
 
-def render_view_all_contracts(contracts):
+def render_view_all_contracts(contracts, connected_collaborator: Collaborator):
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Contract Controller] view_contracts() called[/bold yellow]",
+            f"[bold yellow][Contract Controller] view_contracts() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -58,11 +59,13 @@ def render_view_all_contracts(contracts):
     console.rule("End of contract list", style="bold green")
 
 
-def render_choice_contract(contracts: list) -> str | None:
+def render_choice_contract(
+        contracts: list,
+        connected_collaborator: Collaborator) -> str | None:
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Contract Controller] read_contracts() called[/bold yellow]",
+            f"[bold yellow][Contract Controller] read_contracts() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -75,7 +78,7 @@ def render_choice_contract(contracts: list) -> str | None:
         return None
 
     contract_choices = [
-        f"{contract.id} : (Contract number) of customer : {contract.customer.first_name} {contract.customer.last_name} | Amount: {contract.contract_amount}"
+        f"{contract.id} : (Contract number) of customer : {contract.customer.first_name} {contract.customer.last_name} | Amount: {contract.contract_amount} of sales collaborator: {contract.customer.collaborator.first_name} {contract.customer.collaborator.last_name}"
         for contract in contracts
     ]
     contract_choice = questionary.select(
@@ -84,11 +87,11 @@ def render_choice_contract(contracts: list) -> str | None:
     return contract_choice
 
 
-def render_read_contract(contract_object):
+def render_read_contract(contract_object, connected_collaborator: Collaborator):
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Contract Controller] render_read_contract() called[/bold yellow]",
+            f"[bold yellow][Contract Controller] render_read_contract() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )

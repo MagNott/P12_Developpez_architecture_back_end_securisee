@@ -27,7 +27,7 @@ def ask_last_name() -> str:
 
 def ask_email() -> str:
     while True:
-        email = console.input("Enter email: ")
+        email = console.input("Enter email (need to be unique): ")
         if is_valid_email(email):
             return email
         console.print("[red]Invalid email. Enter a valid email address.[/red]")

@@ -15,6 +15,7 @@ from app.utils.database_utils import commit_to_db
 from app.utils.collaborator_utils import find_collaborator_by_login
 from app.utils.password_utils import verify_password
 from app.views.collaborator_input_view import (
+    ask_confirm_delete,
     ask_login,
     ask_password,
     ask_collaborator_modification,
@@ -34,7 +35,7 @@ class CollaboratorController:
         session = Session()
 
         try:
-            user_info = get_signup_info()
+            user_info = get_signup_info(self.authenticated_collaborator)
             hashed_password = hash_password(user_info["password"])
 
             collaborator = Collaborator(
@@ -95,7 +96,7 @@ class CollaboratorController:
         session = Session()
 
         try:
-            user_info = get_signup_info()
+            user_info = get_signup_info(self.authenticated_collaborator)
             hashed_password = hash_password(user_info["password"])
 
             collaborator = Collaborator(
@@ -124,7 +125,10 @@ class CollaboratorController:
         session = Session()
         try:
             collaborators = session.query(Collaborator).all()
-            collaborator_choice = render_choice_collaborator(collaborators)
+            collaborator_choice = render_choice_collaborator(
+                collaborators,
+                self.authenticated_collaborator
+            )
             if not collaborator_choice:
                 return
 
@@ -159,8 +163,10 @@ class CollaboratorController:
         session = Session()
         try:
             collaborators = session.query(Collaborator).all()
-            collaborator_choice = render_choice_collaborator(collaborators)
-
+            collaborator_choice = render_choice_collaborator(
+                collaborators,
+                self.authenticated_collaborator
+            )
             if not collaborator_choice:
                 return
 
@@ -168,7 +174,6 @@ class CollaboratorController:
                 session.query(Collaborator)
                 .filter(Collaborator.id == int(collaborator_choice.split(":")[0]))
                 .first())
-            print(collaborator_object)
             if not collaborator_object:
                 return
 
@@ -177,6 +182,11 @@ class CollaboratorController:
                 show_cannot_delete_self()
                 return
 
+            if not collaborator_object:
+                return
+            confirm = ask_confirm_delete(collaborator_object)
+            if not confirm:
+                return
             session.delete(collaborator_object)
             session.commit()
             return True

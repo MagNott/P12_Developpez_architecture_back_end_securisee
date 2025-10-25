@@ -1,5 +1,7 @@
 from rich.console import Console
+from rich.panel import Panel
 import questionary
+from app.models.collaborator import Collaborator
 from app.utils.department_utils import get_departments
 from app.views.user_input_view import (
     ask_first_name,
@@ -12,9 +14,11 @@ from app.views.collaborator_input_view import (
 )
 
 
-def get_signup_info() -> dict:
+def get_signup_info(connected_collaborator: Collaborator) -> dict:
     console = Console()
-    console.print("[bold green]Sign Up[/bold green]")
+    console.print(
+        Panel(f"[bold yellow]Sign Up called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]", expand=False,)
+    )
 
     dict_info_user = {}
 
@@ -38,9 +42,13 @@ def get_signup_info() -> dict:
     return dict_info_user
 
 
-def render_choice_collaborator(collaborators):
+def render_choice_collaborator(
+        collaborators,
+        connected_collaborator: Collaborator) -> str | None:
     console = Console()
-    console.print("[bold blue]Select a Collaborator[/bold blue]")
+    console.print(
+        Panel(f"[bold yellow]Select a Collaborator called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]", expand=False)
+    )
 
     if not collaborators:
         console.print("[bold red]No collaborators available.[/bold red]")

@@ -37,9 +37,7 @@ def ask_sales_collaborator_change(sales_collaborators: list[Collaborator]) -> in
 
 
 def ask_customer_modification(
-    customer_object: Customer,
-    current_commercial_name: str,
-    sales_collaborators: list[Collaborator],
+    customer_object: Customer
 ) -> dict:
     console = Console()
     console.print("[bold green]Modify Customer Information[/bold green]")
@@ -60,12 +58,5 @@ def ask_customer_modification(
 
     if ask_if_update("company name", str(customer_object.company_name)):
         customer_updated["company_name"] = ask_company_name()
-
-    if ask_if_update("commercial", current_commercial_name):
-        new_sales_collaborator_id = ask_sales_collaborator_change(
-            sales_collaborators
-        )
-        if new_sales_collaborator_id:
-            customer_updated["commercial_id"] = new_sales_collaborator_id
 
     return customer_updated

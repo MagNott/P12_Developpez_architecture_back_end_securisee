@@ -14,7 +14,7 @@ console = Console()
 
 def ask_login() -> str:
     while True:
-        login = console.input("Enter login: ")
+        login = console.input("Enter login (need to be unique): ")
         if is_valid_login(login):
             return login
         console.print("[red]Login cannot be empty[/red]")
@@ -59,3 +59,10 @@ def ask_collaborator_modification(collaborator: Collaborator) -> dict:
     # need to split to get only the id part
 
     return collaborator_updated
+
+
+def ask_confirm_delete(collaborator: Collaborator) -> bool:
+    confirm = questionary.confirm(
+        f"Are you sure you want to delete {collaborator.first_name} {collaborator.last_name} (ID {collaborator.id})?"
+    ).ask()
+    return confirm is True

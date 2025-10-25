@@ -1,10 +1,6 @@
 from rich.console import Console
-from app.validators.event_validator import (
-    is_valid_attendees,
-    is_valid_date,
-    is_valid_location,
-    is_valid_notes
-)
+from app.validators.event_validator import (is_end_date_after_start, is_valid_attendees,
+    is_valid_date, is_valid_location, is_valid_notes)
 from app.views.common_input_view import ask_if_update
 
 console = Console()
@@ -70,5 +66,16 @@ def ask_event_modification(event_object) -> dict:
 
     if ask_if_update("end date", str(event_object.end_date)):
         event_updated["end_date"] = ask_end_date()
+
+    start_date = str(event_updated.get("start_date", event_object.start_date))
+    end_date = str(event_updated.get("end_date", event_object.end_date))
+
+    while not is_end_date_after_start(
+        start_date,
+        end_date
+    ):
+        console.print("[red]End date must be after or equal to start date.[/red]")
+        event_updated["end_date"] = ask_end_date()
+        end_date = str(event_updated["end_date"])
 
     return event_updated

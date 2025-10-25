@@ -6,7 +6,6 @@ MANAGEMENT = "Management"
 SUPPORT = "Support"
 SALES = "Sales"
 
-
 CREATE_COLLABORATOR = "Create Collaborator"
 MODIFY_COLLABORATOR = "Modify Collaborator"
 DELETE_COLLABORATOR = "Delete Collaborator"
@@ -24,7 +23,6 @@ MODIFY_CONTRACT = "Modify contract"
 
 READ_EVENT = "Read event"
 DISPLAY_MY_EVENTS = "Display my events"
-UPDATE_MY_EVENTS = "Update my events"
 VIEW_EVENTS = "View events"
 CREATE_EVENT = "Create event"
 MODIFY_EVENT = "Modify event"

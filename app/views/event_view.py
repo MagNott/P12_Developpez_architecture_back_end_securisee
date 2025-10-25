@@ -1,3 +1,4 @@
+from app.models.collaborator import Collaborator
 from app.views.event_input_view import (
     ask_location,
     ask_notes,
@@ -12,9 +13,9 @@ from app.utils.contract_utils import get_contracts
 from app.validators.event_validator import is_end_date_after_start
 
 
-def get_event_info(session) -> dict:
+def get_event_info(session, connected_collaborator: Collaborator) -> dict:
     console = Console()
-    console.print("[bold green]Create an event[/bold green]")
+    console.print(f"[bold green]Create an event with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold green]")
 
     dict_event = {}
 
@@ -42,11 +43,11 @@ def get_event_info(session) -> dict:
     return dict_event
 
 
-def render_view_all_events(events):
+def render_view_all_events(events, connected_collaborator: Collaborator):
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Event Controller] view_events() called[/bold yellow]",
+            f"[bold yellow][Event Controller] view_events() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -63,11 +64,11 @@ def render_view_all_events(events):
     console.rule("End of event list", style="bold green")
 
 
-def render_choice_event(events):
+def render_choice_event(events, connected_collaborator: Collaborator) -> str | None:
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Event Controller] read_event() called[/bold yellow]",
+            f"[bold yellow][Event Controller] read_event() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -88,11 +89,14 @@ def render_choice_event(events):
     return event_choice
 
 
-def render_view_event_details(event_object):
+def render_view_event_details(
+        event_object,
+        connected_collaborator: Collaborator
+):
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Event Controller] Event Details[/bold yellow]",
+            f"[bold yellow][Event Controller] Event Details with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -114,11 +118,14 @@ def render_view_event_details(event_object):
     console.rule("End of event details", style="bold green")
 
 
-def render_choice_support_collaborator(support_collaborators):
+def render_choice_support_collaborator(
+        support_collaborators,
+        connected_collaborator: Collaborator
+) -> str | None:
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Event Controller] Select Support Collaborator[/bold yellow]",
+            f"[bold yellow][Event Controller] Select Support Collaborator with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -133,11 +140,11 @@ def render_choice_support_collaborator(support_collaborators):
     return collaborator_choice
 
 
-def render_view_my_events(events):
+def render_view_my_events(events, connected_collaborator: Collaborator):
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Event Controller] display_my_events() called[/bold yellow]",
+            f"[bold yellow][Event Controller] display_my_events() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )

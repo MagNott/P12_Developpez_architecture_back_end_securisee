@@ -33,6 +33,7 @@ from app.controllers.customer_controller import CustomerController
 from app.controllers.collaborator_controller import CollaboratorController
 from app.controllers.event_controller import EventController
 
+
 def action_main_menu():
     while True:
         action = render_main_menu()
@@ -133,6 +134,9 @@ def action_management_menu():
         elif action == VIEW_CUSTOMERS:
             customer_controller = CustomerController()
             customer_controller.view_customers()
+        elif action == READ_CUSTOMER:
+            customer_controller = CustomerController()
+            customer_controller.read_customer()
         elif action == CREATE_COLLABORATOR:
             collaborator_controller = CollaboratorController()
             collaborator_controller.create_collaborator()
@@ -164,6 +168,9 @@ def action_support_menu():
         elif action == VIEW_CUSTOMERS:
             customer_controller = CustomerController()
             customer_controller.view_customers()
+        elif action == READ_CUSTOMER:
+            customer_controller = CustomerController()
+            customer_controller.read_customer()
         elif action == VIEW_EVENTS:
             event_controller = EventController()
             event_controller.view_events()

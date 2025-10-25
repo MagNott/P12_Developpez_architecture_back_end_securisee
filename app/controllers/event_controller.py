@@ -37,7 +37,7 @@ class EventController:
 
         try:
             events = session.query(Event).all()
-            render_view_all_events(events)
+            render_view_all_events(events, self.authenticated_collaborator)
         finally:
             session.close()
             Session.remove()
@@ -50,7 +50,10 @@ class EventController:
         session = Session()
 
         try:
-            event_info = get_event_info(session)
+            event_info = get_event_info(
+                session,
+                self.authenticated_collaborator
+            )
             event = Event(
                 location=event_info["location"],
                 attendees=event_info["attendees"],
@@ -78,7 +81,10 @@ class EventController:
 
         try:
             events = session.query(Event).all()
-            event_choice = render_choice_event(events)
+            event_choice = render_choice_event(
+                events,
+                self.authenticated_collaborator
+            )
             if not event_choice:
                 return
 
@@ -89,7 +95,10 @@ class EventController:
             )
             if not event_object:
                 return
-            render_view_event_details(event_object)
+            render_view_event_details(
+                event_object,
+                self.authenticated_collaborator
+            )
         finally:
             session.close()
             Session.remove()
@@ -110,7 +119,10 @@ class EventController:
             )
             # a support collaborator can only modify their own events
 
-            event_choice = render_choice_event(events)
+            event_choice = render_choice_event(
+                events,
+                self.authenticated_collaborator
+            )
             if not event_choice:
                 return
 
@@ -155,7 +167,10 @@ class EventController:
             if not events_without_support:
                 show_events_without_support_collaborator(events_without_support)
                 return
-            event_choice = render_choice_event(events_without_support)
+            event_choice = render_choice_event(
+                events_without_support,
+                self.authenticated_collaborator
+            )
             if not event_choice:
                 return
 
@@ -174,7 +189,8 @@ class EventController:
                 if collaborator["departement"] == "Support"
             ]
             collaborator_choice = render_choice_support_collaborator(
-                support_collaborators
+                support_collaborators,
+                self.authenticated_collaborator
             )
             if not collaborator_choice:
                 return
@@ -203,7 +219,7 @@ class EventController:
                 .filter(Event.collaborator_id == self.authenticated_collaborator.id)
                 .all()
             )
-            render_view_my_events(events)
+            render_view_my_events(events, self.authenticated_collaborator)
         finally:
             session.close()
             Session.remove()

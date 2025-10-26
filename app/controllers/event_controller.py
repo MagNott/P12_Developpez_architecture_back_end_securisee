@@ -20,6 +20,7 @@ from app.views.event_view import (
 )
 from app.utils.database_utils import commit_to_db
 from app.utils.collaborator_utils import get_collaborators
+from app.views.user_input_view import ask_first_name
 
 
 class EventController:
@@ -49,7 +50,7 @@ class EventController:
         session = Session()
 
         try:
-            event_info = get_event_info()
+            event_info = get_event_info(session)
             event = Event(
                 location=event_info["location"],
                 attendees=event_info["attendees"],
@@ -102,7 +103,9 @@ class EventController:
         try:
             events = (
                 session.query(Event)
-                .filter(Event.collaborator_id == self.authenticated_collaborator.id)
+                .filter(
+                    Event.collaborator_id == self.authenticated_collaborator.id
+                )
                 .all()
             )
             # a support collaborator can only modify their own events
@@ -117,6 +120,9 @@ class EventController:
                 .first()
             )
             if not event_object:
+                return
+            if not event_object.collaborator_id == self.authenticated_collaborator.id:  # type: ignore
+                render_access_denied()
                 return
 
             event_updated = ask_event_modification(event_object)
@@ -161,7 +167,7 @@ class EventController:
             if not event_object:
                 return
 
-            collaborators = get_collaborators()
+            collaborators = get_collaborators(session)
             support_collaborators = [
                 collaborator
                 for collaborator in collaborators

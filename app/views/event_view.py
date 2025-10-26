@@ -12,7 +12,7 @@ from app.utils.contract_utils import get_contracts
 from app.validators.event_validator import is_end_date_after_start
 
 
-def get_event_info() -> dict:
+def get_event_info(session) -> dict:
     console = Console()
     console.print("[bold green]Create an event[/bold green]")
 
@@ -28,7 +28,7 @@ def get_event_info() -> dict:
         console.print("[red]End date must be after start date.[/red]")
         dict_event["end_date"] = ask_end_date()
 
-    contracts = get_contracts()
+    contracts = get_contracts(session)
     contract_choices = [
         f"{contract['id']}: {contract['name']}" for contract in contracts
     ]

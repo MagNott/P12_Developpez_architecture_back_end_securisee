@@ -1,46 +1,67 @@
 from unittest.mock import patch
+from app.controllers.contract_controller import ContractController
 
 
 def test_view_contract_success(
-    mock_session,
-    contract_controller,
+    db_session,
     fake_contracts,
+    fake_collaborators,
 ):
+    contract_controller = ContractController()
 
-    mock_session.query.return_value.all.return_value = fake_contracts
+    authenticated_user = fake_collaborators[2]  # Sales department
 
-    patch_can_read = patch.object(
-        contract_controller.permission, "can_read", return_value=True
-    )
     patch_session = patch(
         "app.controllers.contract_controller.Session",
-        return_value=mock_session
+        return_value=db_session
     )
     patch_render = patch(
         "app.controllers.contract_controller.render_view_all_contracts"
     )
 
-    with patch_can_read, patch_session, patch_render as mock_render:
+    with patch_session, patch_render as mock_render:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
         contract_controller.view_contracts()
 
     mock_render.assert_called_once_with(fake_contracts)
-    mock_session.query.assert_called_once()
 
 
-def test_create_contract_success(
-    mock_session,
-    contract_controller,
-    fake_contract_info,
+def test_view_contract_access_denied(
+    db_session,
 ):
-
-    patch_can_create = patch.object(
-        contract_controller.permission, "can_create_contract",
-        return_value=True
-    )
+    # no authenticated user so access should be denied
+    contract_controller = ContractController()
 
     patch_session = patch(
         "app.controllers.contract_controller.Session",
-        return_value=mock_session
+        return_value=db_session
+    )
+    patch_render = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with patch_session, patch_render as mock_render:
+
+        contract_controller.view_contracts()
+
+    mock_render.assert_called_once()
+
+
+def test_create_contract_success(
+    db_session,
+    fake_contract_info,
+    fake_collaborators
+):
+    contract_controller = ContractController()
+    authenticated_user = fake_collaborators[0]  # Management department
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
     )
     patch_get_info = patch(
         "app.controllers.contract_controller.get_contract_info",
@@ -51,40 +72,92 @@ def test_create_contract_success(
         return_value="1: Jean Durand"
     )
 
-    patch_commit = patch(
-        "app.controllers.contract_controller.commit_to_db", return_value=True
-    )
     patch_render_success = patch(
         "app.controllers.contract_controller.show_created_contract_success"
     )
 
     with (
-        patch_can_create
-    ), (
         patch_session
     ), (
         patch_get_info
-    ), (patch_choice_customer
-    ), patch_commit as mock_commit, patch_render_success as mock_render_success:
+    ), (
+        patch_choice_customer
+    ), patch_render_success as mock_render_success:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
         contract_controller.create_contract()
 
-    mock_commit.assert_called_once()
     mock_render_success.assert_called_once()
 
 
-def test_read_contract_success(
-    mock_session,
-    contract_controller,
-    fake_contracts,
+def test_create_contract_failure_no_auth(
+    db_session,
 ):
-    patch_can_read = patch.object(
-        contract_controller.permission, "can_read", return_value=True
-    )
+    # no authenticated user so access should be denied
+    contract_controller = ContractController()
 
     patch_session = patch(
         "app.controllers.contract_controller.Session",
-        return_value=mock_session
+        return_value=db_session
     )
+    patch_render_access_denied = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        contract_controller.create_contract()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_create_contract_failure_is_not_management(
+    db_session, fake_collaborators
+):
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+    authenticated_user = fake_collaborators[1]  # Support department
+
+    patch_render_access_denied = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
+        contract_controller.create_contract()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_read_contract_success(
+    db_session,
+    fake_contracts,
+    fake_collaborators,
+):
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+
+    authenticated_user = fake_collaborators[2]  # Sales department
+
     patch_render_choice = patch(
         "app.controllers.contract_controller.render_choice_contract",
         return_value="1: Contract for Jean Durand",
@@ -93,37 +166,139 @@ def test_read_contract_success(
         "app.controllers.contract_controller.render_read_contract"
     )
 
-    mock_session.query.return_value.filter.return_value.first.return_value = (
-        fake_contracts[0]
-    )
-
     with (
-        patch_can_read
-    ), (
         patch_session
     ), (
         patch_render_choice
     ), patch_render as mock_render:
 
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
         contract_controller.read_contract()
 
     mock_render.assert_called_once_with(fake_contracts[0])
 
 
-def test_modify_contract_success(
-    mock_session,
-    contract_controller,
-    fake_contracts,
-    fake_contract_info,
+def test_read_constract_failure_no_auth(
+    db_session,
 ):
-    patch_can_modify = patch.object(
-        contract_controller.permission, "can_modify_contract",
-        return_value=True
-    )
+    # no authenticated user so access should be denied
+    contract_controller = ContractController()
 
     patch_session = patch(
         "app.controllers.contract_controller.Session",
-        return_value=mock_session
+        return_value=db_session
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        contract_controller.read_contract()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_modify_contract_success(
+    db_session,
+    fake_contract_info,
+    fake_collaborators,
+):
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+    authenticated_user = fake_collaborators[2]  # Sales department
+    patch_render_choice = patch(
+        "app.controllers.contract_controller.render_choice_contract",
+        return_value="1: Contract for Jean Durand",
+    )
+    patch_ask_contract_modification = patch(
+        "app.controllers.contract_controller.ask_contract_modification",
+        return_value=fake_contract_info
+    )
+
+    patch_render_success = patch(
+        "app.controllers.contract_controller.show_modified_contract_success"
+    )
+
+    with (
+        patch_render_choice
+    ), (
+        patch_session
+    ), (
+        patch_ask_contract_modification
+    ), patch_render_success as mock_render_success:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
+        contract_controller.modify_contract()
+
+    mock_render_success.assert_called_once()
+
+
+def test_modify_contract_failure_is_not_dedicated_sales(
+    db_session,
+    fake_contract_info,
+    fake_collaborators,
+):
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+
+    authenticated_user = fake_collaborators[1]  # Support department
+
+    patch_render_choice = patch(
+        "app.controllers.contract_controller.render_choice_contract",
+        return_value="1: Contract for Jean Durand",
+    )
+    patch_ask_contract_modification = patch(
+        "app.controllers.contract_controller.ask_contract_modification",
+        return_value=fake_contract_info
+    )
+    patch_render_success = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with (
+        patch_render_choice
+    ), (
+        patch_session
+    ), (
+        patch_ask_contract_modification
+    ), patch_render_success as mock_render_success:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
+        contract_controller.modify_contract()
+
+    mock_render_success.assert_called_once()
+
+
+def test_modify_contract_failure_no_auth(
+    db_session,
+    fake_contract_info,
+):
+    # no authenticated user so access should be denied
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
     )
     patch_render_choice = patch(
         "app.controllers.contract_controller.render_choice_contract",
@@ -133,28 +308,18 @@ def test_modify_contract_success(
         "app.controllers.contract_controller.ask_contract_modification",
         return_value=fake_contract_info
     )
-    patch_commit = patch(
-        "app.controllers.contract_controller.commit_to_db", return_value=True
-    )
-    patch_render_success = patch(
-        "app.controllers.contract_controller.show_modified_contract_success"
-    )
-
-    mock_session.query.return_value.filter.return_value.first.return_value = (
-        fake_contracts[0]
+    patch_render_error = patch(
+        "app.controllers.contract_controller.render_access_denied"
     )
 
     with (
-        patch_can_modify
+        patch_render_choice
     ), (
         patch_session
     ), (
-        patch_render_choice
-    ), (
         patch_ask_contract_modification
-    ), patch_commit as mock_commit, patch_render_success as mock_render_success:
+    ), patch_render_error as mock_render_error:
 
         contract_controller.modify_contract()
 
-    mock_commit.assert_called_once()
-    mock_render_success.assert_called_once()
+    mock_render_error.assert_called_once()

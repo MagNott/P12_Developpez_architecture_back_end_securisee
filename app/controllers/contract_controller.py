@@ -134,7 +134,7 @@ class ContractController:
             if not contract_object:
                 return
 
-            statuses = get_statuses()
+            statuses = get_statuses(session)
 
             current_status = (
                 session.query(Status)

@@ -1,4 +1,3 @@
-from app.models.customer import Customer
 from app.utils.session_utils import (
     get_authenticated_department,
     is_authenticated,
@@ -31,6 +30,7 @@ class Permission:
         )
 
     def can_modify_contract(self):
+        print(f"Permission check: Authenticated={self.is_collaborator_authenticated()}, Department={self.department}")
         return self.is_collaborator_authenticated() and self.department in [
             MANAGEMENT,
             SALES,

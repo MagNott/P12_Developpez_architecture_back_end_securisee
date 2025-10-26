@@ -3,81 +3,158 @@ from app.controllers.customer_controller import CustomerController
 
 
 def test_view_customers_success(
-    mock_session,
-    fake_customers,
+    db_session,
+    fake_collaborators,
+    fake_customers
 ):
     customer_controller = CustomerController()
 
-    mock_session.query.return_value.all.return_value = fake_customers
-
-    patch_can_read = patch.object(
-        customer_controller.permission, "can_read", return_value=True
-    )
     patch_session = patch(
-        "app.controllers.customer_controller.Session", return_value=mock_session
+        "app.controllers.customer_controller.Session",
+        return_value=db_session
     )
+
+    authenticated_user = fake_collaborators[2]  # Sales department
+
     patch_render = patch(
         "app.controllers.customer_controller.render_view_all_customers"
     )
 
-    with patch_can_read, patch_session, patch_render as mock_render:
+    with patch_session, patch_render as mock_render:
+
+        customer_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        customer_controller.permission.department = \
+            authenticated_user.department.name
         customer_controller.view_customers()
 
     mock_render.assert_called_once_with(fake_customers)
 
 
-def test_create_customer_success(
-    mock_session,
-    customer_controller,
-    fake_customer_info,
+def test_view_customers_access_denied(
+    db_session,
 ):
-
-    patch_can_create = patch.object(
-        customer_controller.permission, "can_create_customer",
-        return_value=True
-    )
+    # no authenticated user so access should be denied
+    customer_controller = CustomerController()
 
     patch_session = patch(
         "app.controllers.customer_controller.Session",
-        return_value=mock_session
+        return_value=db_session
     )
+    patch_render = patch(
+        "app.controllers.customer_controller.render_access_denied"
+    )
+
+    with patch_session, patch_render as mock_render:
+
+        customer_controller.view_customers()
+
+    mock_render.assert_called_once()
+
+
+def test_create_customer_success(
+    db_session,
+    customer_controller,
+    fake_customer_info,
+    fake_collaborators,
+):
+    customer_controller = CustomerController()
+
+    patch_session = patch(
+        "app.controllers.customer_controller.Session",
+        return_value=db_session
+    )
+
+    authenticated_user = fake_collaborators[2]  # Sales department
+
     patch_get_info = patch(
         "app.controllers.customer_controller.get_customer_info",
         return_value=fake_customer_info,
-    )
-    patch_commit = patch(
-        "app.controllers.customer_controller.commit_to_db", return_value=True
     )
     patch_render_success = patch(
         "app.controllers.customer_controller.show_created_customer_success"
     )
 
     with (
-        patch_can_create
-    ), (
         patch_session
     ), (
         patch_get_info
-    ), patch_commit as mock_commit, patch_render_success as mock_render_success:
+    ), patch_render_success as mock_render_success:
 
+        customer_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        customer_controller.authenticated_collaborator = authenticated_user
+        customer_controller.permission.department = \
+            authenticated_user.department.name
         customer_controller.create_customer()
 
     mock_render_success.assert_called_once()
-    mock_commit.assert_called_once()
 
 
-def test_read_customer_success(
-    mock_session,
-    customer_controller,
-    fake_customers,
+def test_create_customer_failure_no_auth(
+    db_session,
 ):
-    patch_can_read = patch.object(
-        customer_controller.permission, "can_read", return_value=True
-    )
+    # no authenticated user so access should be denied
+    customer_controller = CustomerController()
 
     patch_session = patch(
         "app.controllers.customer_controller.Session",
-        return_value=mock_session
+        return_value=db_session
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.customer_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        customer_controller.create_customer()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_create_customer_failure_is_not_sales(
+    db_session,
+    fake_collaborators,
+):
+    customer_controller = CustomerController()
+
+    patch_session = patch(
+        "app.controllers.customer_controller.Session",
+        return_value=db_session
+    )
+    authenticated_user = fake_collaborators[0]  # Management department
+
+    patch_render_access_denied = patch(
+        "app.controllers.customer_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        customer_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        customer_controller.permission.department = \
+            authenticated_user.department.name
+        customer_controller.create_customer()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_read_customer_success(
+    db_session,
+    fake_collaborators,
+    fake_customers,
+):
+    customer_controller = CustomerController()
+
+    authenticated_user = fake_collaborators[0]  # Management department
+
+    patch_session = patch(
+        "app.controllers.customer_controller.Session",
+        return_value=db_session
     )
     patch_render_choice = patch(
         "app.controllers.customer_controller.render_choice_customer",
@@ -88,36 +165,54 @@ def test_read_customer_success(
         "app.controllers.customer_controller.render_read_customer"
     )
 
-    mock_session.query.return_value.filter.return_value.first.return_value = (
-        fake_customers[0]
-    )
-
     with (
-        patch_can_read
-    ), (
         patch_session
-    ), patch_render_choice as mock_render_choice, patch_render_read as mock_render_read:
+    ), patch_render_choice, patch_render_read as mock_render_read:
+
+        customer_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        customer_controller.permission.department = \
+            authenticated_user.department.name
         customer_controller.read_customer()
 
     mock_render_read.assert_called_once_with(fake_customers[0])
-    mock_render_choice.assert_called_once()
 
 
-def test_modify_customer_success(
-    mock_session,
-    customer_controller,
-    fake_customers,
-    fake_collaborators,
-    fake_customer_info,
+def test_read_customer_failure_no_auth(
+    db_session,
 ):
-    patch_can_modify = patch.object(
-        customer_controller.permission, "can_modify_customer",
-        return_value=True
-    )
+    # no authenticated user so access should be denied
+    customer_controller = CustomerController()
 
     patch_session = patch(
         "app.controllers.customer_controller.Session",
-        return_value=mock_session
+        return_value=db_session
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.customer_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        customer_controller.read_customer()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_modify_customer_success(
+    db_session,
+    fake_collaborators,
+    fake_customer_info,
+):
+    customer_controller = CustomerController()
+
+    authenticated_user = fake_collaborators[2]  # Sales department
+
+    patch_session = patch(
+        "app.controllers.customer_controller.Session",
+        return_value=db_session
     )
     patch_render_choice = patch(
         "app.controllers.customer_controller.render_choice_customer",
@@ -129,23 +224,105 @@ def test_modify_customer_success(
         return_value=fake_customer_info,
     )
 
-    patch_commit = patch(
-        "app.controllers.customer_controller.commit_to_db", return_value=True
-    )
-
-    mock_session.query.return_value.filter.return_value.first.side_effect = [
-        fake_customers[0],
-        fake_collaborators[2],
-    ]
-
     with (
-        patch_can_modify
-    ), (
         patch_session
-    ), patch_render_choice as mock_render_choice, (
+    ), (
         patch_get_info
-    ), patch_commit as mock_commit:
+    ), patch_render_choice as mock_render_choice:
+
+        customer_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        customer_controller.authenticated_collaborator = authenticated_user
+        customer_controller.permission.department = \
+            authenticated_user.department.name
         customer_controller.modify_customer()
 
     mock_render_choice.assert_called_once()
-    mock_commit.assert_called_once()
+
+
+def test_modify_customer_failure_no_auth(
+    db_session,
+):
+    # no authenticated user so access should be denied
+    customer_controller = CustomerController()
+
+    patch_session = patch(
+        "app.controllers.customer_controller.Session",
+        return_value=db_session
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.customer_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        customer_controller.modify_customer()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_modify_customer_failure_not_sales(
+    db_session,
+    fake_collaborators,
+):
+    customer_controller = CustomerController()
+
+    authenticated_user = fake_collaborators[0]  # Management department
+
+    patch_session = patch(
+        "app.controllers.customer_controller.Session",
+        return_value=db_session
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.customer_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        customer_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        customer_controller.permission.department = \
+            authenticated_user.department.name
+        customer_controller.modify_customer()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_modify_customer_failure_not_owner(
+    db_session,
+    fake_collaborators,
+):
+    customer_controller = CustomerController()
+
+    authenticated_user = fake_collaborators[3]  # Sales department
+
+    patch_session = patch(
+        "app.controllers.customer_controller.Session",
+        return_value=db_session
+    )
+    patch_render_choice = patch(
+        "app.controllers.customer_controller.render_choice_customer",
+        return_value="1: Jean Durand",
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.customer_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), (
+        patch_render_choice
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        customer_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        customer_controller.authenticated_collaborator = authenticated_user
+        customer_controller.permission.department = \
+            authenticated_user.department.name
+        customer_controller.modify_customer()
+
+    mock_render_access_denied.assert_called_once()

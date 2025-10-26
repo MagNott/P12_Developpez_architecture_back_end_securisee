@@ -16,7 +16,8 @@ def test_generate_token_success(fake_management_collaborator):
     assert token is not None
     assert isinstance(token, str)
     assert decoded["login"] == fake_management_collaborator.login
-    assert decoded["department"] == fake_management_collaborator.department.name
+    expected_department = fake_management_collaborator.department.name
+    assert decoded["department"] == expected_department
     assert "exp" in decoded
     assert decoded["exp"] > datetime.datetime.now().timestamp()
 
@@ -54,11 +55,14 @@ def test_is_authenticated_success(
         result = is_authenticated()
 
     assert result is not False
-    assert str(result.login) == "AliceMartin"
-    assert result.department.name == "Management"
+    assert str(result.login) == "AliceMartin"  # type: ignore
+    assert result.department.name == "Management"  # type: ignore
 
 
-def test_is_authenticated_expired_token(mock_file, fake_management_collaborator):
+def test_is_authenticated_expired_token(
+        mock_file,
+        fake_management_collaborator
+):
     expired_payload = {
         "login": fake_management_collaborator.login,
         "exp": datetime.datetime.now() - datetime.timedelta(days=4000),

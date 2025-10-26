@@ -3,7 +3,10 @@ from app.utils import database_utils
 
 def test_commit_to_db_success(mock_session, fake_management_collaborator):
 
-    result = database_utils.commit_to_db(mock_session, fake_management_collaborator)
+    result = database_utils.commit_to_db(
+        mock_session,
+        fake_management_collaborator
+    )
 
     assert result is True
     mock_session.add.assert_called_once_with(fake_management_collaborator)

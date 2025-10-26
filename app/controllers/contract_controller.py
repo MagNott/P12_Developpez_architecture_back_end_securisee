@@ -58,7 +58,10 @@ class ContractController:
             contract_info = get_contract_info(self.authenticated_collaborator)
 
             customer_list = session.query(Customer).all()
-            customer_contract_choice = render_choice_customer(customer_list)
+            customer_contract_choice = render_choice_customer(
+                customer_list,
+                self.authenticated_collaborator
+            )
             if not customer_contract_choice:
                 show_created_contract_error()
                 return
@@ -158,7 +161,7 @@ class ContractController:
                 return
 
             # Only commercial collaborator can modify their own customers
-            if not (self.department == MANAGEMENT or contract_object.customer.commercial_id != self.authenticated_collaborator.id):  # type: ignore
+            if not (self.permission.department == MANAGEMENT or contract_object.customer.commercial_id == self.authenticated_collaborator.id):  # type: ignore
                 render_access_denied()
                 return
 

@@ -20,11 +20,12 @@ def test_view_events_success(
     with patch_session, patch_render as mock_render:
         event_controller.permission.authenticated_collaborator = \
             authenticated_user
+        event_controller.authenticated_collaborator = authenticated_user
         event_controller.permission.department = \
             authenticated_user.department.name
         event_controller.view_events()
 
-    mock_render.assert_called_once_with(fake_events)
+    mock_render.assert_called_once_with(fake_events, authenticated_user)
 
 
 def test_view_events_failure_no_auth(
@@ -162,11 +163,15 @@ def test_read_events_success(
 
         event_controller.permission.authenticated_collaborator = \
             authenticated_user
+        event_controller.authenticated_collaborator = authenticated_user
         event_controller.permission.department = \
             authenticated_user.department.name
         event_controller.read_event()
 
-    mock_render_details.assert_called_once_with(fake_events[0])
+    mock_render_details.assert_called_once_with(
+        fake_events[0],
+        authenticated_user
+    )
 
 
 def test_read_events_failure_no_auth(
@@ -419,7 +424,7 @@ def test_display_my_events_success(
             authenticated_user.department.name
         event_controller.display_my_events()
 
-    mock_render.assert_called_once_with([fake_events[0], fake_events[2]])
+    mock_render.assert_called_once_with([fake_events[0], fake_events[2]], authenticated_user)
 
 
 def test_display_my_events_failure_no_auth(

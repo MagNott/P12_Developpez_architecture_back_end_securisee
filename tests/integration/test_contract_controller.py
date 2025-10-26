@@ -1,5 +1,6 @@
 from unittest.mock import patch
 from app.controllers.contract_controller import ContractController
+from tests.conftest import department_management
 
 
 def test_view_contract_success(
@@ -23,11 +24,12 @@ def test_view_contract_success(
 
         contract_controller.permission.authenticated_collaborator = \
             authenticated_user
+        contract_controller.authenticated_collaborator = authenticated_user
         contract_controller.permission.department = \
             authenticated_user.department.name
         contract_controller.view_contracts()
 
-    mock_render.assert_called_once_with(fake_contracts)
+    mock_render.assert_called_once_with(fake_contracts, authenticated_user)
 
 
 def test_view_contract_access_denied(
@@ -174,11 +176,12 @@ def test_read_contract_success(
 
         contract_controller.permission.authenticated_collaborator = \
             authenticated_user
+        contract_controller.authenticated_collaborator = authenticated_user
         contract_controller.permission.department = \
             authenticated_user.department.name
         contract_controller.read_contract()
 
-    mock_render.assert_called_once_with(fake_contracts[0])
+    mock_render.assert_called_once_with(fake_contracts[0], authenticated_user)
 
 
 def test_read_constract_failure_no_auth(
@@ -239,6 +242,7 @@ def test_modify_contract_success(
 
         contract_controller.permission.authenticated_collaborator = \
             authenticated_user
+        contract_controller.authenticated_collaborator = authenticated_user
         contract_controller.permission.department = \
             authenticated_user.department.name
         contract_controller.modify_contract()

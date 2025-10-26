@@ -60,7 +60,10 @@ class CollaboratorController:
 
         try:
             user_login = ask_login()
-            collaborator_found = find_collaborator_by_login(user_login)
+            collaborator_found = find_collaborator_by_login(
+                user_login,
+                session
+            )
 
             user_password_clear = ask_password()
 
@@ -149,40 +152,40 @@ class CollaboratorController:
             Session.remove()
 
     def delete_collaborator(self):
-        permission = Permission()
-        if permission.can_delete_collaborator():
+        if not self.permission.can_delete_collaborator():
+            render_access_denied()
+            return
 
-            session = Session()
-            try:
-                collaborators = session.query(Collaborator).all()
-                collaborator_choice = render_choice_collaborator(collaborators)
-                if not collaborator_choice:
-                    return
+        session = Session()
+        try:
+            collaborators = session.query(Collaborator).all()
+            collaborator_choice = render_choice_collaborator(collaborators)
 
-                collaborator_object = (
-                    session.query(Collaborator)
-                    .filter(Collaborator.id == int(collaborator_choice.split(":")[0]))
-                    .first())
-                if not collaborator_object:
-                    return
-                authenticated = cast(
-                    Collaborator,
-                    self.authenticated_collaborator
-                )
-                # Help for Pylance - import cast from typing
-                if collaborator_object.id == authenticated.id:  # type: ignore
-                    show_cannot_delete_self()
-                    return
+            if not collaborator_choice:
+                return
 
-                session.delete(collaborator_object)
-                session.commit()
-                return True
-            except Exception as e:
-                # Even if no explicit transaction seems to have started,
-                # rollback prevents issues if something was implicitly flushed.
-                session.rollback()
-                show_error_commiting_to_db(e)
-                return False
-            finally:
-                session.close()
-                Session.remove()
+            collaborator_object = (
+                session.query(Collaborator)
+                .filter(Collaborator.id == int(collaborator_choice.split(":")[0]))
+                .first())
+            print(collaborator_object)
+            if not collaborator_object:
+                return
+
+            # Help for Pylance - import cast from typing
+            if collaborator_object.id == self.authenticated_collaborator.id:  # type: ignore
+                show_cannot_delete_self()
+                return
+
+            session.delete(collaborator_object)
+            session.commit()
+            return True
+        except Exception as e:
+            # Even if no explicit transaction seems to have started,
+            # rollback prevents issues if something was implicitly flushed.
+            session.rollback()
+            show_error_commiting_to_db(e)
+            return False
+        finally:
+            session.close()
+            Session.remove()

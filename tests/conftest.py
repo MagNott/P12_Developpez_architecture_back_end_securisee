@@ -15,6 +15,62 @@ from app.controllers.contract_controller import ContractController  # noqa: E402
 from app.models.event import Event  # noqa: E402
 from app.controllers.event_controller import EventController  # noqa: E402
 from app.controllers.collaborator_controller import CollaboratorController  # noqa: E402
+from sqlalchemy import create_engine  # noqa: E402
+from sqlalchemy.orm import sessionmaker  # noqa: E402
+from db import BaseModel  # noqa: E402
+
+
+@pytest.fixture
+def db_engine():
+    engine = create_engine("sqlite:///:memory:")
+    BaseModel.metadata.create_all(engine)
+    return engine
+
+
+@pytest.fixture(scope="function")
+def db_session(db_engine, fake_collaborators, fake_customers, fake_contracts, fake_events, department_management, department_support, department_sales, status_pending, status_signed, status_unsigned):
+    Session = sessionmaker(bind=db_engine)
+    session = Session()
+
+    # adding initial department data
+    session.add_all([
+        department_management,
+        department_support,
+        department_sales
+    ])
+    session.commit()
+
+    # adding initial collaborator data
+    for collaborator in fake_collaborators:
+        session.add(collaborator)
+    session.commit()
+
+    # adding initial customer data
+    for customer in fake_customers:
+        session.add(customer)
+    session.commit()
+
+    # adding initial status data (required for contracts)
+    session.add_all([
+        status_pending,
+        status_signed,
+        status_unsigned
+    ])
+    session.commit()
+
+    # adding initial contract data
+    for contract in fake_contracts:
+        # link the status already added to the session
+        session.add(contract)
+    session.commit()
+
+    # adding initial event data
+    for event in fake_events:
+        session.add(event)
+    session.commit()
+
+    yield session
+    session.close()
 
 
 @pytest.fixture
@@ -32,10 +88,10 @@ def fake_authenticated_collaborator():
 
 
 @pytest.fixture
-def mock_query(fake_collaborator):
+def mock_query(fake_management_collaborator):
     with patch(
         "app.controllers.collaborator_controller.find_collaborator_by_login",
-        return_value=fake_collaborator,
+        return_value=fake_management_collaborator,
     ):
         yield
 
@@ -55,9 +111,9 @@ def collaborator_controller(fake_authenticated_collaborator):
 
 
 @pytest.fixture
-def contract_controller(fake_authenticated_collaborator):
+def contract_controller():
     controller = ContractController()
-    controller.authenticated_collaborator = fake_authenticated_collaborator
+    #controller.authenticated_collaborator = fake_authenticated_collaborator
     return controller
 
 
@@ -79,9 +135,18 @@ def mock_get_signup_info(fake_collaborator_info):
 def mock_ask_login():
     with patch(
         "app.controllers.collaborator_controller.ask_login",
-        return_value="Alice",
-    ):
-        yield
+        return_value="AMartin",
+    ) as mocked:
+        yield mocked
+
+
+@pytest.fixture
+def mock_ask_login_fail():
+    with patch(
+        "app.controllers.collaborator_controller.ask_login",
+        return_value="Toto",
+    ) as mocked:
+        yield mocked
 
 
 @pytest.fixture
@@ -89,8 +154,8 @@ def mock_ask_password():
     with patch(
         "app.controllers.collaborator_controller.ask_password",
         return_value="hashed",
-    ):
-        yield
+    ) as mocked:
+        yield mocked
 
 
 @pytest.fixture
@@ -100,12 +165,12 @@ def mock_file():
 
 
 @pytest.fixture
-def mock_is_authenticated_management(fake_collaborator):
+def mock_is_authenticated_management(fake_management_collaborator):
     with patch(
         "app.utils.session_utils.is_authenticated",
-        return_value=fake_collaborator,
+        return_value=fake_management_collaborator,
     ):
-        yield fake_collaborator
+        yield fake_management_collaborator
 
 
 @pytest.fixture
@@ -124,23 +189,38 @@ def mock_department_menu():
 
 
 @pytest.fixture
-def fake_collaborator() -> Collaborator:
-    fake_collaborator = Collaborator(
-        first_name="Alice",
-        last_name="Martin",
-        mail="alice@example.com",
-        phone_number="0606060606",
-        login="AMartin",
-        password="hashed",
-        department_id=1,
-        department=Department(id=1, name="Management"),
-    )
-    # Adding a department object to avoid AttributeError in tests
-    return fake_collaborator
+def department_management():
+    return Department(id=1, name="Management")
 
 
 @pytest.fixture
-def fake_collaborator_to_delete():
+def department_support():
+    return Department(id=2, name="Support")
+
+
+@pytest.fixture
+def department_sales():
+    return Department(id=3, name="Sales")
+
+
+@pytest.fixture
+def fake_management_collaborator(department_management) -> Collaborator:
+    fake_management_collaborator = Collaborator(
+        first_name="Alice",
+        last_name="Martin",
+        mail="alice.martin@example.com",
+        phone_number="0606060606",
+        login="AliceMartin",
+        password="hashed",
+        department_id=1,
+        department=department_management,
+    )
+    # Adding a department object to avoid AttributeError in tests
+    return fake_management_collaborator
+
+
+@pytest.fixture
+def fake_collaborator_to_delete(department_support):
     return Collaborator(
         id=2,
         first_name="Jean",
@@ -149,42 +229,66 @@ def fake_collaborator_to_delete():
         password="hashed",
         mail="jean@example.com",
         department_id=1,
-        department=Department(id=1, name="Support"),
+        department=department_support,
     )
 
 
 @pytest.fixture
-def fake_collaborators() -> list[Collaborator]:
+def fake_collaborators(
+    department_management,
+    department_support,
+    department_sales
+) -> list[Collaborator]:
     return [
         Collaborator(
             first_name="Alice",
             last_name="Martin",
-            mail="alice@example.com",
+            mail="alice.martin@example.com",
             phone_number="0606060606",
             login="AMartin",
             password="hashed",
             department_id=1,
-            department=Department(id=1, name="Management"),
+            department=department_management,
         ),
         Collaborator(
             first_name="Bob",
             last_name="Defrance",
-            mail="bob@example.com",
+            mail="bob.defrance@example.com",
             phone_number="0707070707",
             login="BDefrance",
             password="hashed",
             department_id=2,
-            department=Department(id=2, name="Support"),
+            department=department_support,
         ),
         Collaborator(
             first_name="Carole",
             last_name="Blanchard",
-            mail="carole@example.com",
+            mail="carole.blanchard@example.com",
             phone_number="0808080808",
             login="CBlanchard",
             password="hashed",
             department_id=3,
-            department=Department(id=3, name="Sales"),
+            department=department_sales,
+        ),
+        Collaborator(
+            first_name="David",
+            last_name="Dupuis",
+            mail="david.dupuis@example.com",
+            phone_number="0909090909",
+            login="DDupuis",
+            password="hashed",
+            department_id=3,
+            department=department_sales,
+        ),
+        Collaborator(
+            first_name="Margot",
+            last_name="Gomes",
+            mail="margot.gomes@example.com",
+            phone_number="0707070707",
+            login="MGomes",
+            password="hashed",
+            department_id=2,
+            department=department_support,
         ),
     ]
 
@@ -192,9 +296,21 @@ def fake_collaborators() -> list[Collaborator]:
 @pytest.fixture
 def fake_collaborator_info() -> dict:
     return {
+        "first_name": "Diana",
+        "last_name": "Jones",
+        "email": "diana.jones@example.com",
+        "phone_number": "0707070707",
+        "login": "DJones",
+        "password": "password123",
+        "department_id": 1,
+    }
+
+@pytest.fixture
+def fake_collaborator_info_already_exists() -> dict:
+    return {
         "first_name": "Alice",
         "last_name": "Martin",
-        "email": "alice@example.com",
+        "email": "alice.martin@example.com",
         "phone_number": "0606060606",
         "login": "AMartin",
         "password": "password123",
@@ -203,7 +319,7 @@ def fake_collaborator_info() -> dict:
 
 
 @pytest.fixture
-def fake_customer(fake_collaborator) -> Customer:
+def fake_customer(fake_collaborators) -> Customer:
     now = datetime.date.today()
 
     customer = Customer(
@@ -214,15 +330,14 @@ def fake_customer(fake_collaborator) -> Customer:
         company_name="Durand SARL",
         creation_date=now,
         last_update=now,
-        commercial_id=fake_collaborator.id,
-        collaborator=fake_collaborator,  # Bi-directional link
+        commercial_id=fake_collaborators[2].id,
+        collaborator=fake_collaborators[2],  # Bi-directional link
     )
-
     return customer
 
 
 @pytest.fixture
-def fake_customers(fake_collaborator) -> list[Customer]:
+def fake_customers(fake_collaborators) -> list[Customer]:
     now = datetime.date.today()
 
     customers = [
@@ -234,8 +349,8 @@ def fake_customers(fake_collaborator) -> list[Customer]:
             company_name="Durand SARL",
             creation_date=now,
             last_update=now,
-            commercial_id=fake_collaborator.id,
-            collaborator=fake_collaborator,
+            commercial_id=fake_collaborators[2].id,
+            collaborator=fake_collaborators[2],
         ),
         Customer(
             first_name="Lucie",
@@ -245,8 +360,8 @@ def fake_customers(fake_collaborator) -> list[Customer]:
             company_name="Moreau Consulting",
             creation_date=now,
             last_update=now,
-            commercial_id=fake_collaborator.id,
-            collaborator=fake_collaborator,
+            commercial_id=fake_collaborators[2].id,
+            collaborator=fake_collaborators[2],
         ),
     ]
 
@@ -256,21 +371,30 @@ def fake_customers(fake_collaborator) -> list[Customer]:
 @pytest.fixture
 def fake_customer_info() -> dict:
     return {
-        "first_name": "Jean",
-        "last_name": "Durand",
-        "email": "jean.durand@example.com",
-        "phone_number": "0707070707",
-        "company_name": "Durand SARL",
+        "first_name": "Éloïse",
+        "last_name": "Bertillon",
+        "email": "eloise.bertillond@example.com",
+        "phone_number": "0755123489",
+        "company_name": "NebulaTech",
     }
 
 
 @pytest.fixture
-def fake_contracts(fake_customers) -> list[Contract]:
-    today = datetime.date.today()
+def status_pending():
+    return Status(id=1, name="Pending")
 
-    status_pending = Status(id=1, name="Pending")
-    status_signed = Status(id=2, name="Signed")
-    status_unsigned = Status(id=3, name="Unsigned")
+@pytest.fixture
+def status_signed():
+    return Status(id=2, name="Signed")
+
+@pytest.fixture
+def status_unsigned():
+    return Status(id=3, name="Unsigned")
+
+
+@pytest.fixture
+def fake_contracts(fake_customers, status_pending, status_signed, status_unsigned) -> list[Contract]:
+    today = datetime.date.today()
 
     return [
         Contract(
@@ -321,8 +445,8 @@ def fake_events(fake_contracts, fake_collaborators) -> list[Event]:
             end_date=date(2025, 11, 3),
             contract_id=fake_contracts[0].id,
             contract=fake_contracts[0],
-            collaborator_id=fake_collaborators[0].id,
-            collaborator=fake_collaborators[0],
+            collaborator_id=fake_collaborators[1].id,
+            collaborator=fake_collaborators[1],
         ),
         Event(
             id=2,
@@ -333,8 +457,8 @@ def fake_events(fake_contracts, fake_collaborators) -> list[Event]:
             end_date=date(2025, 12, 6),
             contract_id=fake_contracts[1].id,
             contract=fake_contracts[1],
-            collaborator_id=fake_collaborators[1].id,
-            collaborator=fake_collaborators[1],
+            collaborator_id=None,
+            collaborator=None,
         ),
         Event(
             id=3,
@@ -345,8 +469,8 @@ def fake_events(fake_contracts, fake_collaborators) -> list[Event]:
             end_date=date(2025, 12, 11),
             contract_id=fake_contracts[2].id,
             contract=fake_contracts[2],
-            collaborator_id=fake_collaborators[2].id,
-            collaborator=fake_collaborators[2],
+            collaborator_id=fake_collaborators[1].id,
+            collaborator=fake_collaborators[1],
         ),
     ]
 
@@ -360,5 +484,5 @@ def fake_event_info(fake_contracts, fake_collaborators) -> dict:
         "start_date": date(2025, 11, 20),
         "end_date": date(2025, 11, 21),
         "contract_id": fake_contracts[0].id,
-        "collaborator_id": fake_collaborators[0].id,
+        "collaborator_id": fake_collaborators[1].id,
     }

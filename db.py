@@ -1,7 +1,11 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
 
-DATABASE_URL = "postgresql+psycopg2://p12_user:mdpp12@localhost:5432/p12_db"
+if os.getenv("ENV_TEST") == "true":
+    DATABASE_URL = "sqlite:///:memory:"
+else:
+    DATABASE_URL = "postgresql+psycopg2://p12_user:mdpp12@localhost:5432/p12_db"
 
 engine = create_engine(DATABASE_URL)
 engine.connect()

@@ -5,6 +5,7 @@ from typing import cast
 from app.utils.collaborator_utils import find_collaborator_by_login
 from app.models.collaborator import Collaborator
 from app.models.department import Department
+from db import Session
 
 # NEED TO PROTECT THE SECRET KEY BETTER AFTER
 SECRET_KEY = "ma_cle_secrete"
@@ -49,6 +50,7 @@ def is_authenticated() -> Collaborator | bool:
         Collaborator | bool: The authenticated collaborator or False if
         not authenticated
     """
+    session = Session()
     if not os.path.exists(SESSION_FILE):
         return False
     try:
@@ -60,7 +62,10 @@ def is_authenticated() -> Collaborator | bool:
             algorithms=["HS256"],
             options={"verify_exp": True},
         )
-        collaborator = find_collaborator_by_login(collaborator_data["login"])
+        collaborator = find_collaborator_by_login(
+            collaborator_data["login"],
+            session
+        )
         if not collaborator:
             return False
         return collaborator

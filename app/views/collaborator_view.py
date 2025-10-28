@@ -18,10 +18,7 @@ def get_signup_info(session, connected_collaborator: Collaborator) -> dict:
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow]Sign Up called with "
-            f"{connected_collaborator.first_name} "
-            f"{connected_collaborator.last_name} - "
-            f"{connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow]Sign Up called [/bold yellow]",
             expand=False,
         )
     )

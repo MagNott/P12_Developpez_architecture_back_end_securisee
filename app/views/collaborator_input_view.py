@@ -4,7 +4,7 @@ from app.models.collaborator import Collaborator
 from app.utils.department_utils import get_departments
 from app.validators.collaborator_validators import (
     is_valid_login,
-    is_valid_password,
+    is_valid_password_complexity,
 )
 from app.views.common_input_view import ask_if_update
 from app.views.user_input_view import (
@@ -27,10 +27,18 @@ def ask_login() -> str:
 
 def ask_password() -> str:
     while True:
+        console.print(
+            "[bold yellow]Password must contain at least:[/bold yellow]\n"
+            "- 12 characters\n"
+            "- One lowercase letter\n"
+            "- One uppercase letter\n"
+            "- One number\n"
+            "- One special character (@$!%*#?&)"
+        )
         password = console.input("Enter password: ", password=True)
-        if is_valid_password(password):
+        if is_valid_password_complexity(password):
             return password
-        console.print("[red]Password cannot be empty[/red]")
+        console.print("[red]Password need to be valid and not empty[/red]")
 
 
 def ask_collaborator_modification(session, collaborator: Collaborator) -> dict:

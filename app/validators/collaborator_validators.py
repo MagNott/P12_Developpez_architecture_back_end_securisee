@@ -24,10 +24,6 @@ def is_valid_login(login) -> bool:
     return bool(login.strip()) and len(login) <= 20
 
 
-# def is_valid_password(password) -> bool:
-#     return bool(password.strip()) and len(password) <= 100
-
-
 def is_valid_password_complexity(password: str) -> bool:
 
     pattern = re.compile(

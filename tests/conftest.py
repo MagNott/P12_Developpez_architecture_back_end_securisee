@@ -10,11 +10,7 @@ from app.models.department import Department  # noqa: E402
 from app.models.customer import Customer  # noqa: E402
 from app.models.contract import Contract  # noqa: E402
 from app.models.status import Status  # noqa: E402
-from app.controllers.customer_controller import CustomerController  # noqa: E402
-from app.controllers.contract_controller import ContractController  # noqa: E402
 from app.models.event import Event  # noqa: E402
-from app.controllers.event_controller import EventController  # noqa: E402
-from app.controllers.collaborator_controller import CollaboratorController  # noqa: E402
 from sqlalchemy import create_engine  # noqa: E402
 from sqlalchemy.orm import sessionmaker  # noqa: E402
 from db import BaseModel  # noqa: E402
@@ -28,7 +24,17 @@ def db_engine():
 
 
 @pytest.fixture(scope="function")
-def db_session(db_engine, fake_collaborators, fake_customers, fake_contracts, fake_events, department_management, department_support, department_sales, status_pending, status_signed, status_unsigned):
+def db_session(db_engine,
+               fake_collaborators,
+               fake_customers,
+               fake_contracts,
+               fake_events,
+               department_management,
+               department_support,
+               department_sales,
+               status_pending,
+               status_signed,
+               status_unsigned):
     Session = sessionmaker(bind=db_engine)
     session = Session()
 
@@ -74,61 +80,19 @@ def db_session(db_engine, fake_collaborators, fake_customers, fake_contracts, fa
 
 
 @pytest.fixture
+def mock_file():
+    with patch("os.path.exists", return_value=True), \
+         patch("builtins.open", mock_open(read_data="")) as mocked_file:
+        yield mocked_file
+
+
+@pytest.fixture
 def mock_session():
     fake_session = MagicMock(name="Session")
     with patch(
         "db.Session", return_value=fake_session
     ):
         yield fake_session
-
-
-@pytest.fixture
-def fake_authenticated_collaborator():
-    return MagicMock(id=1)
-
-
-@pytest.fixture
-def mock_query(fake_management_collaborator):
-    with patch(
-        "app.controllers.collaborator_controller.find_collaborator_by_login",
-        return_value=fake_management_collaborator,
-    ):
-        yield
-
-
-@pytest.fixture
-def customer_controller(fake_authenticated_collaborator):
-    controller = CustomerController()
-    controller.authenticated_collaborator = fake_authenticated_collaborator
-    return controller
-
-
-@pytest.fixture
-def collaborator_controller(fake_authenticated_collaborator):
-    controller = CollaboratorController()
-    controller.authenticated_collaborator = fake_authenticated_collaborator
-    return controller
-
-
-@pytest.fixture
-def contract_controller():
-    controller = ContractController()
-    #controller.authenticated_collaborator = fake_authenticated_collaborator
-    return controller
-
-
-@pytest.fixture
-def event_controller():
-    return EventController()
-
-
-@pytest.fixture
-def mock_get_signup_info(fake_collaborator_info):
-    with patch(
-        "app.controllers.collaborator_controller.get_signup_info",
-        return_value=fake_collaborator_info,
-    ):
-        yield
 
 
 @pytest.fixture
@@ -159,12 +123,6 @@ def mock_ask_password():
 
 
 @pytest.fixture
-def mock_file():
-    with patch("builtins.open", mock_open()) as mocked_file:
-        yield mocked_file
-
-
-@pytest.fixture
 def mock_is_authenticated_management(fake_management_collaborator):
     with patch(
         "app.utils.session_utils.is_authenticated",
@@ -179,12 +137,6 @@ def mock_is_authenticated_no_auth():
         "app.utils.session_utils.is_authenticated",
         return_value=None,
     ):
-        yield
-
-
-@pytest.fixture
-def mock_department_menu():
-    with patch("app.controllers.menu_controller.department_menu"):
         yield
 
 
@@ -217,20 +169,6 @@ def fake_management_collaborator(department_management) -> Collaborator:
     )
     # Adding a department object to avoid AttributeError in tests
     return fake_management_collaborator
-
-
-@pytest.fixture
-def fake_collaborator_to_delete(department_support):
-    return Collaborator(
-        id=2,
-        first_name="Jean",
-        last_name="Dupont",
-        login="JDupont",
-        password="hashed",
-        mail="jean@example.com",
-        department_id=1,
-        department=department_support,
-    )
 
 
 @pytest.fixture
@@ -304,6 +242,7 @@ def fake_collaborator_info() -> dict:
         "password": "password123",
         "department_id": 1,
     }
+
 
 @pytest.fixture
 def fake_collaborator_info_already_exists() -> dict:
@@ -383,9 +322,11 @@ def fake_customer_info() -> dict:
 def status_pending():
     return Status(id=1, name="Pending")
 
+
 @pytest.fixture
 def status_signed():
     return Status(id=2, name="Signed")
+
 
 @pytest.fixture
 def status_unsigned():
@@ -393,7 +334,12 @@ def status_unsigned():
 
 
 @pytest.fixture
-def fake_contracts(fake_customers, status_pending, status_signed, status_unsigned) -> list[Contract]:
+def fake_contracts(
+    fake_customers,
+    status_pending,
+    status_signed,
+    status_unsigned
+) -> list[Contract]:
     today = datetime.date.today()
 
     return [

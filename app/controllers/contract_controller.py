@@ -21,7 +21,7 @@ from app.views.contract_input_view import (
     ask_contract_modification,
 )
 from app.utils.database_utils import commit_to_db
-from app.utils.constants import MANAGEMENT
+from app.utils.constants import MANAGEMENT, SALES
 from app.models.collaborator import Collaborator
 from app.views.event_view import show_no_contracts_available
 from app.utils.status_utils import get_statuses
@@ -151,11 +151,18 @@ class ContractController:
 
         session = Session()
         try:
-            contracts = get_contracts(session)
-            filtered_contracts = [
-                c for c in contracts
-                if c.customer.commercial_id == self.authenticated_collaborator.id  # noqa: E501
-            ]
+            # Only commercial collaborator can modify their own
+            # customers' contracts, a management collaborator can modify all.
+            if self.authenticated_collaborator.department.name == SALES:
+                contracts = get_contracts(session)
+                filtered_contracts = [
+                    c for c in contracts
+                    if c.customer.commercial_id == self.authenticated_collaborator.id]  # noqa: E501
+            elif self.authenticated_collaborator.department.name == MANAGEMENT:
+                filtered_contracts = get_contracts(session)
+            else:
+                render_access_denied()
+                return
 
             contract_choice = render_choice_contract(
                 filtered_contracts,
@@ -180,8 +187,6 @@ class ContractController:
             if not current_status:
                 return
 
-            # Only commercial collaborator can modify their own
-            # customers' contracts
             # Even though the contract list is pre-filtered, need to
             # double-check access rights for safety.
             if not (

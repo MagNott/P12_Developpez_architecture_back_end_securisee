@@ -3,6 +3,7 @@ from app.controllers.customer_controller import CustomerController
 
 
 def test_view_customers_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_customers
@@ -33,6 +34,7 @@ def test_view_customers_success(
 
 
 def test_view_customers_access_denied(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -54,8 +56,8 @@ def test_view_customers_access_denied(
 
 
 def test_create_customer_success(
+    mock_file,
     db_session,
-    customer_controller,
     fake_customer_info,
     fake_collaborators,
 ):
@@ -93,6 +95,7 @@ def test_create_customer_success(
 
 
 def test_create_customer_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -116,6 +119,7 @@ def test_create_customer_failure_no_auth(
 
 
 def test_create_customer_failure_is_not_sales(
+    mock_file,
     db_session,
     fake_collaborators,
 ):
@@ -145,6 +149,7 @@ def test_create_customer_failure_is_not_sales(
 
 
 def test_read_customer_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_customers,
@@ -184,6 +189,7 @@ def test_read_customer_success(
 
 
 def test_read_customer_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -207,6 +213,7 @@ def test_read_customer_failure_no_auth(
 
 
 def test_modify_customer_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_customer_info,
@@ -246,6 +253,7 @@ def test_modify_customer_success(
 
 
 def test_modify_customer_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -269,6 +277,7 @@ def test_modify_customer_failure_no_auth(
 
 
 def test_modify_customer_failure_not_sales(
+    mock_file,
     db_session,
     fake_collaborators,
 ):
@@ -298,6 +307,7 @@ def test_modify_customer_failure_not_sales(
 
 
 def test_modify_customer_failure_not_owner(
+    mock_file,
     db_session,
     fake_collaborators,
 ):

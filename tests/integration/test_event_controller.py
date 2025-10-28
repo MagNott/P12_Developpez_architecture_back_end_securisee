@@ -3,6 +3,7 @@ from app.controllers.event_controller import EventController
 
 
 def test_view_events_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_events,
@@ -31,6 +32,7 @@ def test_view_events_success(
 
 
 def test_view_events_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -52,6 +54,7 @@ def test_view_events_failure_no_auth(
 
 
 def test_create_event_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_event_info,
@@ -87,6 +90,7 @@ def test_create_event_success(
 
 
 def test_create_event_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -108,6 +112,7 @@ def test_create_event_failure_no_auth(
 
 
 def test_create_event_failure_wrong_department(
+    mock_file,
     db_session,
     fake_collaborators,
 ):
@@ -138,6 +143,7 @@ def test_create_event_failure_wrong_department(
 
 
 def test_read_events_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_events,
@@ -177,6 +183,7 @@ def test_read_events_success(
 
 
 def test_read_events_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -198,6 +205,7 @@ def test_read_events_failure_no_auth(
 
 
 def test_modify_event_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_event_info,
@@ -240,6 +248,7 @@ def test_modify_event_success(
 
 
 def test_modify_event_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -261,6 +270,7 @@ def test_modify_event_failure_no_auth(
 
 
 def test_modify_event_failure_not_dedicated_collaborator(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_event_info,
@@ -305,6 +315,7 @@ def test_modify_event_failure_not_dedicated_collaborator(
 
 
 def test_assign_event_success(
+    mock_file,
     db_session,
     fake_events,
     fake_collaborators,
@@ -357,6 +368,7 @@ def test_assign_event_success(
 
 
 def test_assign_event_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -378,6 +390,7 @@ def test_assign_event_failure_no_auth(
 
 
 def test_assign_event_failure_not_management(
+    mock_file,
     db_session,
     fake_collaborators,
 ):
@@ -409,6 +422,7 @@ def test_assign_event_failure_not_management(
 
 
 def test_display_my_events_success(
+    mock_file,
     db_session,
     fake_events,
     fake_collaborators,
@@ -440,6 +454,7 @@ def test_display_my_events_success(
 
 
 def test_display_my_events_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -461,6 +476,7 @@ def test_display_my_events_failure_no_auth(
 
 
 def test_display_my_events_failure_not_support(
+    mock_file,
     db_session,
     fake_collaborators,
 ):

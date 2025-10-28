@@ -3,6 +3,7 @@ from app.controllers.contract_controller import ContractController
 
 
 def test_view_contract_success(
+    mock_file,
     db_session,
     fake_contracts,
     fake_collaborators,
@@ -32,6 +33,7 @@ def test_view_contract_success(
 
 
 def test_view_contract_access_denied(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -53,6 +55,7 @@ def test_view_contract_access_denied(
 
 
 def test_create_contract_success(
+    mock_file,
     db_session,
     fake_contract_info,
     fake_collaborators
@@ -95,6 +98,7 @@ def test_create_contract_success(
 
 
 def test_create_contract_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -118,7 +122,9 @@ def test_create_contract_failure_no_auth(
 
 
 def test_create_contract_failure_is_not_management(
-    db_session, fake_collaborators
+    mock_file,
+    db_session,
+    fake_collaborators
 ):
     contract_controller = ContractController()
 
@@ -146,6 +152,7 @@ def test_create_contract_failure_is_not_management(
 
 
 def test_read_contract_success(
+    mock_file,
     db_session,
     fake_contracts,
     fake_collaborators,
@@ -183,7 +190,8 @@ def test_read_contract_success(
     mock_render.assert_called_once_with(fake_contracts[0], authenticated_user)
 
 
-def test_read_constract_failure_no_auth(
+def test_read_contract_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -207,6 +215,7 @@ def test_read_constract_failure_no_auth(
 
 
 def test_modify_contract_success(
+    mock_file,
     db_session,
     fake_contract_info,
     fake_collaborators,
@@ -250,6 +259,7 @@ def test_modify_contract_success(
 
 
 def test_modify_contract_failure_is_not_dedicated_sales(
+    mock_file,
     db_session,
     fake_contract_info,
     fake_collaborators,
@@ -293,6 +303,7 @@ def test_modify_contract_failure_is_not_dedicated_sales(
 
 
 def test_modify_contract_failure_no_auth(
+    mock_file,
     db_session,
     fake_contract_info,
 ):
@@ -329,6 +340,7 @@ def test_modify_contract_failure_no_auth(
 
 
 def test_filter_contracts_by_status_unsigned_success(
+    mock_file,
     db_session,
     fake_contracts,
     fake_collaborators,
@@ -370,6 +382,7 @@ def test_filter_contracts_by_status_unsigned_success(
 
 
 def test_filter_contract_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -393,6 +406,7 @@ def test_filter_contract_no_auth(
 
 
 def test_filter_contracts_by_status_not_sales(
+    mock_file,
     db_session,
     fake_collaborators,
 ):
@@ -429,6 +443,7 @@ def test_filter_contracts_by_status_not_sales(
 
 
 def test_filter_contracts_not_fully_paid(
+    mock_file,
     db_session,
     fake_contracts,
     fake_collaborators,
@@ -465,6 +480,7 @@ def test_filter_contracts_not_fully_paid(
 
 
 def test_filter_contracts_not_fully_paid_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -488,6 +504,7 @@ def test_filter_contracts_not_fully_paid_no_auth(
 
 
 def test_filter_contracts_not_fully_paid_not_sales(
+    mock_file,
     db_session,
     fake_collaborators,
 ):

@@ -175,7 +175,7 @@ def render_choice_support_collaborator(
     )
 
     collaborator_choices = [
-        f"{coll['id']}: {coll['name']} - {coll['department']}"
+        f"{coll['id']}: {coll['name']}"
         for coll in support_collaborators
     ]
     collaborator_choice = questionary.select(

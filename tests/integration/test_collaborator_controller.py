@@ -4,6 +4,7 @@ from app.models.collaborator import Collaborator
 
 
 def test_signup_success(
+        mock_file,
         db_session,
         fake_collaborator_info
 ):
@@ -35,6 +36,7 @@ def test_signup_success(
 
 
 def test_signup_failure(
+        mock_file,
         db_session,
         fake_collaborator_info_already_exists
 ):
@@ -64,6 +66,7 @@ def test_signup_failure(
 
 
 def test_signin_success(
+    mock_file,
     db_session,
     mock_ask_login,
     mock_ask_password,
@@ -102,6 +105,7 @@ def test_signin_success(
 
 
 def test_signin_failure_wrong_login(
+    mock_file,
     db_session,
     mock_ask_login_fail,
     mock_ask_password
@@ -122,6 +126,7 @@ def test_signin_failure_wrong_login(
 
 
 def test_signin_failure_wrong_password(
+    mock_file,
     db_session,
     mock_ask_login,
     mock_ask_password,
@@ -153,6 +158,7 @@ def test_signin_failure_wrong_password(
 
 
 def test_create_collaborator_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_collaborator_info,
@@ -189,6 +195,7 @@ def test_create_collaborator_success(
 
 
 def test_create_collaborator_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -209,6 +216,7 @@ def test_create_collaborator_failure_no_auth(
 
 
 def test_create_collaborator_failure_wrong_department(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_collaborator_info,
@@ -245,6 +253,7 @@ def test_create_collaborator_failure_wrong_department(
 
 
 def test_modify_collaborator_success(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_collaborator_info,
@@ -285,6 +294,7 @@ def test_modify_collaborator_success(
 
 
 def test_modify_collaborator_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -305,6 +315,7 @@ def test_modify_collaborator_failure_no_auth(
 
 
 def test_modify_collaborator_failure_wrong_department(
+    mock_file,
     db_session,
     fake_collaborators,
     fake_collaborator_info,
@@ -347,6 +358,7 @@ def test_modify_collaborator_failure_wrong_department(
 
 
 def test_delete_collaborator_success(
+    mock_file,
     db_session,
     fake_collaborators,
 ):
@@ -384,6 +396,7 @@ def test_delete_collaborator_success(
 
 
 def test_delete_collaborator_forbidden_self_deletion(
+    mock_file,
     db_session,
     fake_collaborators,
 ):
@@ -420,6 +433,7 @@ def test_delete_collaborator_forbidden_self_deletion(
 
 
 def test_delete_collaborator_failure_no_auth(
+    mock_file,
     db_session,
 ):
     # no authenticated user so access should be denied
@@ -440,6 +454,7 @@ def test_delete_collaborator_failure_no_auth(
 
 
 def test_delete_collaborator_failure_wrong_department(
+    mock_file,
     db_session,
     fake_collaborators,
 ):

@@ -3,9 +3,9 @@ from app.validators.collaborator_validators import (
     is_valid_first_name,
     is_valid_last_name,
     is_valid_email,
+    is_valid_password_complexity,
     is_valid_phone_number,
     is_valid_login,
-    is_valid_password,
 )
 
 
@@ -60,12 +60,20 @@ def test_login_should_be_not_valid_when_empty_string_or_whitespace(login):
     assert is_valid_login(login) is False
 
 
-def test_password_should_be_valid_when_normal_string():
-    assert is_valid_password("securepassword") is True
+def test_password_should_be_valid_when_meeting_complexity_requirements():
+    assert is_valid_password_complexity("StrongPassw0rd!") is True
 
 
-@pytest.mark.parametrize("password", ["", "   "])
-def test_password_should_be_not_valid_when_empty_string_or_whitespace(
-    password,
-):
-    assert is_valid_password(password) is False
+@pytest.mark.parametrize(
+    "password",
+    [
+        "weakpassword",
+        "Short1!",
+        "NoSpecialChar1",
+        "NOSMALLLETTER1!",
+        "nobigletter1!",
+        "NoNumber!",
+    ],
+)
+def test_password_should_not_be_valid_when_not_meeting_complexity_requirements(password):  # noqa: E501
+    assert is_valid_password_complexity(password) is False

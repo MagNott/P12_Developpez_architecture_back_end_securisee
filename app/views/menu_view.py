@@ -7,6 +7,8 @@ from app.utils.constants import (
     CREATE_CUSTOMER,
     CREATE_EVENT,
     DISPLAY_MY_EVENTS,
+    FILTER_CONTRACTS_BY_STATUS,
+    FILTER_CONTRACTS_NOT_FULLY_PAID,
     MODIFY_CUSTOMER,
     MODIFY_EVENT,
     READ_CONTRACT,
@@ -16,7 +18,6 @@ from app.utils.constants import (
     SIGNUP,
     LOGOUT,
     CREATE_CONTRACT,
-    UPDATE_MY_EVENTS,
     MODIFY_CONTRACT,
     MODIFY_COLLABORATOR,
     DELETE_COLLABORATOR,
@@ -26,7 +27,11 @@ from app.utils.constants import (
 )
 
 console = Console()
-texte = "[bold blue]\n Welcome to Epic Events, event management software \n[/bold blue]"
+texte = (
+    "[bold blue]\n"
+    " Welcome to Epic Events, event management software \n"
+    "[/bold blue]"
+)
 
 
 def render_main_menu():
@@ -77,7 +82,6 @@ def render_support_menu():
             READ_EVENT,
             MODIFY_EVENT,
             DISPLAY_MY_EVENTS,
-            UPDATE_MY_EVENTS,
             LOGOUT
         ],
     ).ask()
@@ -95,6 +99,8 @@ def render_sales_menu():
             MODIFY_CUSTOMER,
             VIEW_CONTRACTS,
             READ_CONTRACT,
+            FILTER_CONTRACTS_BY_STATUS,
+            FILTER_CONTRACTS_NOT_FULLY_PAID,
             MODIFY_CONTRACT,
             VIEW_EVENTS,
             READ_EVENT,

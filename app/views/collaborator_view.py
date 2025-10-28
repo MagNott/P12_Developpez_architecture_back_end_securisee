@@ -1,5 +1,7 @@
 from rich.console import Console
+from rich.panel import Panel
 import questionary
+from app.models.collaborator import Collaborator
 from app.utils.department_utils import get_departments
 from app.views.user_input_view import (
     ask_first_name,
@@ -12,9 +14,17 @@ from app.views.collaborator_input_view import (
 )
 
 
-def get_signup_info() -> dict:
+def get_signup_info(session, connected_collaborator: Collaborator) -> dict:
     console = Console()
-    console.print("[bold green]Sign Up[/bold green]")
+    console.print(
+        Panel(
+            f"[bold yellow]Sign Up called with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
+            expand=False,
+        )
+    )
 
     dict_info_user = {}
 
@@ -25,7 +35,7 @@ def get_signup_info() -> dict:
     dict_info_user["login"] = ask_login()
     dict_info_user["password"] = ask_password()
 
-    departments = get_departments()
+    departments = get_departments(session)
     department_choices = [
         f"{dept['id']}: {dept['name']}" for dept in departments
     ]
@@ -38,9 +48,19 @@ def get_signup_info() -> dict:
     return dict_info_user
 
 
-def render_choice_collaborator(collaborators):
+def render_choice_collaborator(
+        collaborators,
+        connected_collaborator: Collaborator) -> str | None:
     console = Console()
-    console.print("[bold blue]Select a Collaborator[/bold blue]")
+    console.print(
+        Panel(
+            f"[bold yellow]Select a Collaborator called with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
+            expand=False
+        )
+    )
 
     if not collaborators:
         console.print("[bold red]No collaborators available.[/bold red]")
@@ -74,21 +94,24 @@ def show_signin_success(collaborator_found):
     console = Console()
     console.print("[bold green]Sign in successful![/bold green]")
     console.print(
-        f"Welcome back, {collaborator_found.first_name} {collaborator_found.last_name}!"
+        f"Welcome back, {collaborator_found.first_name} "
+        f"{collaborator_found.last_name}!"
     )
 
 
 def show_signin_error():
     console = Console()
     console.print(
-        "[bold red]Error during sign in. Check your login and password.[/bold red]"
+        "[bold red]Error during sign in. Check your login and password."
+        "[/bold red]"
     )
 
 
 def show_error_commiting_to_db(e):
     console = Console()
     console.print(
-        "[bold red]Error committing to the database. Please try again.[/bold red]"
+        "[bold red]Error committing to the database. Please try again."
+        "[/bold red]"
     )
     console.print(f"[red]Details: {e}[/red]")
 
@@ -97,4 +120,18 @@ def show_cannot_delete_self():
     console = Console()
     console.print(
         "[bold red]You cannot delete your own account.[/bold red]"
+    )
+
+
+def show_delete_success():
+    console = Console()
+    console.print(
+        "[bold green]Collaborator deleted successfully![/bold green]"
+    )
+
+
+def show_delete_error():
+    console = Console()
+    console.print(
+        "[bold red]Error deleting collaborator. Try again.[/bold red]"
     )

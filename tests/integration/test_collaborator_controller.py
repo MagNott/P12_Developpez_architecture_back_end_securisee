@@ -1,7 +1,6 @@
 from unittest.mock import patch
 from app.controllers.collaborator_controller import CollaboratorController
 from app.models.collaborator import Collaborator
-from app.utils.collaborator_utils import find_collaborator_by_login
 
 
 def test_signup_success(
@@ -363,10 +362,14 @@ def test_delete_collaborator_success(
         "app.controllers.collaborator_controller.render_choice_collaborator",
         return_value=f"{fake_collaborators[1].id}: Defrance Bob",
     )
+    patch_confirm = patch(
+        "app.controllers.collaborator_controller.ask_confirm_delete",
+        return_value=True  # Confirmer la suppression
+    )
 
     with (
         patch_session
-    ), patch_choice:
+    ), patch_choice, patch_confirm:
 
         collaborator_controller.permission.authenticated_collaborator = \
             authenticated_user

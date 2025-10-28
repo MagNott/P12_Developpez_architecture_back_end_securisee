@@ -9,4 +9,3 @@ def get_departments(session) -> list[dict]:
     """
     departments = session.query(Department).all()
     return [{"id": d.id, "name": d.name} for d in departments]
-

@@ -24,11 +24,12 @@ def test_view_customers_success(
 
         customer_controller.permission.authenticated_collaborator = \
             authenticated_user
+        customer_controller.authenticated_collaborator = authenticated_user
         customer_controller.permission.department = \
             authenticated_user.department.name
         customer_controller.view_customers()
 
-    mock_render.assert_called_once_with(fake_customers)
+    mock_render.assert_called_once_with(fake_customers, authenticated_user)
 
 
 def test_view_customers_access_denied(
@@ -171,11 +172,15 @@ def test_read_customer_success(
 
         customer_controller.permission.authenticated_collaborator = \
             authenticated_user
+        customer_controller.authenticated_collaborator = authenticated_user
         customer_controller.permission.department = \
             authenticated_user.department.name
         customer_controller.read_customer()
 
-    mock_render_read.assert_called_once_with(fake_customers[0])
+    mock_render_read.assert_called_once_with(
+        fake_customers[0],
+        authenticated_user
+    )
 
 
 def test_read_customer_failure_no_auth(

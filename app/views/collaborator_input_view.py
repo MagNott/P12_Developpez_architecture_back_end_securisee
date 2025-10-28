@@ -7,14 +7,19 @@ from app.validators.collaborator_validators import (
     is_valid_password,
 )
 from app.views.common_input_view import ask_if_update
-from app.views.user_input_view import ask_email, ask_first_name, ask_last_name, ask_phone_number
+from app.views.user_input_view import (
+    ask_email,
+    ask_first_name,
+    ask_last_name,
+    ask_phone_number
+)
 
 console = Console()
 
 
 def ask_login() -> str:
     while True:
-        login = console.input("Enter login: ")
+        login = console.input("Enter login (need to be unique): ")
         if is_valid_login(login):
             return login
         console.print("[red]Login cannot be empty[/red]")
@@ -28,7 +33,7 @@ def ask_password() -> str:
         console.print("[red]Password cannot be empty[/red]")
 
 
-def ask_collaborator_modification(collaborator: Collaborator) -> dict:
+def ask_collaborator_modification(session, collaborator: Collaborator) -> dict:
     console = Console()
     console.print("[bold green]Modify Collaborator Information[/bold green]")
 
@@ -47,15 +52,25 @@ def ask_collaborator_modification(collaborator: Collaborator) -> dict:
     if ask_if_update("password", str(collaborator.password)):
         collaborator_updated["password"] = ask_password()
 
-    departments = get_departments()
+    departments = get_departments(session)
     department_choices = [
         f"{dept['id']}: {dept['name']}" for dept in departments
     ]
     department_choice = questionary.select(
         "Select your department:", choices=department_choices
     ).ask()
-    collaborator_updated["department_id"] = int(department_choice.split(":")[0])
+    collaborator_updated["department_id"] = int(
+        department_choice.split(":")[0]
+        )
     # need to convert to int because questionary returns a string
     # need to split to get only the id part
 
     return collaborator_updated
+
+
+def ask_confirm_delete(collaborator: Collaborator) -> bool:
+    confirm = questionary.confirm(
+        f"Are you sure you want to delete {collaborator.first_name} "
+        f"{collaborator.last_name} (ID {collaborator.id})?"
+    ).ask()
+    return confirm is True

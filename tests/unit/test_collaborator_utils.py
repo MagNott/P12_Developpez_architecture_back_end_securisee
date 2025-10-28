@@ -1,6 +1,6 @@
 from app.utils.collaborator_utils import (
     find_collaborator_by_login,
-    get_collaborators
+    get_collaborators_by_department
 )
 
 
@@ -33,6 +33,6 @@ def test_get_collaborators_success(
         fake_collaborators,
 ):
 
-    collaborators = get_collaborators(db_session)
+    collaborators = get_collaborators_by_department(db_session)
 
     assert len(collaborators) == len(fake_collaborators)

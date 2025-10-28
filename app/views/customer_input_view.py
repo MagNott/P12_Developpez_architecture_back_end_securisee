@@ -23,13 +23,17 @@ def ask_company_name() -> str:
         console.print("[red]Company name cannot be empty[/red]")
 
 
-def ask_sales_collaborator_change(sales_collaborators: list[Collaborator]) -> int | None:
+def ask_sales_collaborator_change(
+        sales_collaborators: list[Collaborator]
+) -> int | None:
     sales_choices = [
         f"{sales_collaborator.id}: \
         {sales_collaborator.first_name} {sales_collaborator.last_name}"
         for sales_collaborator in sales_collaborators
     ]
-    choice = questionary.select("Select a commercial:", choices=sales_choices).ask()
+    choice = questionary.select(
+        "Select a commercial:", choices=sales_choices
+    ).ask()
 
     if choice:
         return int(choice.split(":")[0])
@@ -37,9 +41,7 @@ def ask_sales_collaborator_change(sales_collaborators: list[Collaborator]) -> in
 
 
 def ask_customer_modification(
-    customer_object: Customer,
-    current_commercial_name: str,
-    sales_collaborators: list[Collaborator],
+    customer_object: Customer
 ) -> dict:
     console = Console()
     console.print("[bold green]Modify Customer Information[/bold green]")
@@ -53,19 +55,12 @@ def ask_customer_modification(
         customer_updated["last_name"] = ask_last_name()
 
     if ask_if_update("email", str(customer_object.mail)):
-        customer_updated["email"] = ask_email()
+        customer_updated["mail"] = ask_email()
 
     if ask_if_update("phone number", str(customer_object.phone_number)):
         customer_updated["phone_number"] = ask_phone_number()
 
     if ask_if_update("company name", str(customer_object.company_name)):
         customer_updated["company_name"] = ask_company_name()
-
-    if ask_if_update("commercial", current_commercial_name):
-        new_sales_collaborator_id = ask_sales_collaborator_change(
-            sales_collaborators
-        )
-        if new_sales_collaborator_id:
-            customer_updated["commercial_id"] = new_sales_collaborator_id
 
     return customer_updated

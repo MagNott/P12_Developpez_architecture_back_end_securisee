@@ -1,4 +1,3 @@
-import app.controllers
 from app.views.menu_view import (
     render_sales_menu,
     render_management_menu,
@@ -8,6 +7,8 @@ from app.views.menu_view import (
 from app.views.menu_view import render_access_denied
 from app.utils.constants import (ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
                                  CREATE_COLLABORATOR,
+                                 FILTER_CONTRACTS_BY_STATUS,
+                                 FILTER_CONTRACTS_NOT_FULLY_PAID,
                                  MODIFY_EVENT,
                                  SALES,
                                  CREATE_CONTRACT,
@@ -32,6 +33,7 @@ from app.controllers.contract_controller import ContractController
 from app.controllers.customer_controller import CustomerController
 from app.controllers.collaborator_controller import CollaboratorController
 from app.controllers.event_controller import EventController
+
 
 def action_main_menu():
     while True:
@@ -87,9 +89,14 @@ def action_sales_menu():
         elif action == READ_CONTRACT:
             contract_controller = ContractController()
             contract_controller.read_contract()
+        elif action == FILTER_CONTRACTS_BY_STATUS:
+            contract_controller = ContractController()
+            contract_controller.filter_contracts_by_status()
+        elif action == FILTER_CONTRACTS_NOT_FULLY_PAID:
+            contract_controller = ContractController()
+            contract_controller.filter_contracts_not_fully_paid()
         elif action == MODIFY_CONTRACT:
             contract_controller = ContractController()
-            contract_controller.modify_contract()
         elif action == VIEW_EVENTS:
             event_controller = EventController()
             event_controller.view_events()
@@ -133,6 +140,9 @@ def action_management_menu():
         elif action == VIEW_CUSTOMERS:
             customer_controller = CustomerController()
             customer_controller.view_customers()
+        elif action == READ_CUSTOMER:
+            customer_controller = CustomerController()
+            customer_controller.read_customer()
         elif action == CREATE_COLLABORATOR:
             collaborator_controller = CollaboratorController()
             collaborator_controller.create_collaborator()
@@ -164,6 +174,9 @@ def action_support_menu():
         elif action == VIEW_CUSTOMERS:
             customer_controller = CustomerController()
             customer_controller.view_customers()
+        elif action == READ_CUSTOMER:
+            customer_controller = CustomerController()
+            customer_controller.read_customer()
         elif action == VIEW_EVENTS:
             event_controller = EventController()
             event_controller.view_events()

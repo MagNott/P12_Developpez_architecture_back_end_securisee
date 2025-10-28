@@ -22,7 +22,7 @@ from app.utils.database_utils import commit_to_db
 class CustomerController:
     def __init__(self):
         self.permission = Permission()
-        self.authenticated_collaborator = self.permission.authenticated_collaborator
+        self.authenticated_collaborator: Collaborator = self.permission.authenticated_collaborator  # noqa: E501
 
     def view_customers(self):
         if not self.permission.can_read():
@@ -33,7 +33,10 @@ class CustomerController:
 
         try:
             customers = session.query(Customer).all()
-            render_view_all_customers(customers)
+            render_view_all_customers(
+                customers,
+                self.authenticated_collaborator
+            )
 
         finally:
             session.close()
@@ -47,7 +50,9 @@ class CustomerController:
         session = Session()
 
         try:
-            customer_info = get_customer_info()
+            customer_info = get_customer_info(
+                self.authenticated_collaborator
+            )
             now = datetime.datetime.now()
             customer = Customer(
                 first_name=customer_info["first_name"],
@@ -70,7 +75,6 @@ class CustomerController:
             Session.remove()
 
     def read_customer(self):
-
         if not self.permission.can_read():
             render_access_denied()
             return
@@ -80,7 +84,10 @@ class CustomerController:
         try:
             customers = session.query(Customer).all()
 
-            customer_choice = render_choice_customer(customers)
+            customer_choice = render_choice_customer(
+                customers,
+                self.authenticated_collaborator
+            )
             if not customer_choice:
                 return
 
@@ -89,7 +96,10 @@ class CustomerController:
                 .filter(Customer.id == int(customer_choice.split(":")[0]))
                 .first()
             )
-            render_read_customer(customer_object)
+            render_read_customer(
+                customer_object,
+                self.authenticated_collaborator
+            )
 
         finally:
             session.close()
@@ -103,8 +113,15 @@ class CustomerController:
         session = Session()
         try:
             customers = session.query(Customer).all()
+            customers_filtered = [
+                c for c in customers
+                if c.commercial_id == self.authenticated_collaborator.id  # type: ignore  # noqa: E501
+            ]
 
-            customer_choice = render_choice_customer(customers)
+            customer_choice = render_choice_customer(
+                customers_filtered,
+                self.authenticated_collaborator
+            )
             if not customer_choice:
                 return
 
@@ -116,31 +133,16 @@ class CustomerController:
             if not customer_object:
                 return
 
-            if customer_object.commercial_id != self.authenticated_collaborator.id:  # type: ignore
+            # Only commercial collaborator can modify their own customers
+            if customer_object.commercial_id != self.authenticated_collaborator.id:  # type: ignore  # noqa: E501
                 render_access_denied()
                 return
 
-            current_sales_collaborator = (
-                session.query(Collaborator)
-                .filter(Collaborator.id == customer_object.commercial_id)
-                .first()
-            )
-            if not current_sales_collaborator:
-                return
-
-            current_sales_collaborator_name = f"{current_sales_collaborator.first_name} {current_sales_collaborator.last_name} (ID {current_sales_collaborator.id})"
-
-            sales_collaborators = (
-                session.query(Collaborator)
-                .filter(Collaborator.department.has(name="Sales"))
-                .all()
-            )
-
             customer_updated = ask_customer_modification(
                 customer_object,
-                current_sales_collaborator_name,
-                sales_collaborators
             )
+            # cannot change the sales collaborator according to
+            # the specifications
 
             if not customer_updated:
                 return
@@ -148,7 +150,7 @@ class CustomerController:
             # Apply updates to the customer object
             for key, value in customer_updated.items():
                 setattr(customer_object, key, value)
-            customer_object.last_update = datetime.datetime.now().date()  # type: ignore
+            customer_object.last_update = datetime.datetime.now().date()  # type: ignore  # noqa: E501
 
             if commit_to_db(session, customer_object):
                 show_modified_customer_success()

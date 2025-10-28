@@ -1,4 +1,3 @@
-import app.controllers
 from app.views.menu_view import (
     render_sales_menu,
     render_management_menu,
@@ -8,6 +7,8 @@ from app.views.menu_view import (
 from app.views.menu_view import render_access_denied
 from app.utils.constants import (ASSIGN_SUPPORT_COLLABORATOR_TO_EVENT,
                                  CREATE_COLLABORATOR,
+                                 FILTER_CONTRACTS_BY_STATUS,
+                                 FILTER_CONTRACTS_NOT_FULLY_PAID,
                                  MODIFY_EVENT,
                                  SALES,
                                  CREATE_CONTRACT,
@@ -88,9 +89,14 @@ def action_sales_menu():
         elif action == READ_CONTRACT:
             contract_controller = ContractController()
             contract_controller.read_contract()
+        elif action == FILTER_CONTRACTS_BY_STATUS:
+            contract_controller = ContractController()
+            contract_controller.filter_contracts_by_status()
+        elif action == FILTER_CONTRACTS_NOT_FULLY_PAID:
+            contract_controller = ContractController()
+            contract_controller.filter_contracts_not_fully_paid()
         elif action == MODIFY_CONTRACT:
             contract_controller = ContractController()
-            contract_controller.modify_contract()
         elif action == VIEW_EVENTS:
             event_controller = EventController()
             event_controller.view_events()

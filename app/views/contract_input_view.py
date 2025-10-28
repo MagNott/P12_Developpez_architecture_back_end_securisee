@@ -30,8 +30,11 @@ def ask_contract_amount_due() -> float:
 
 
 def ask_status_change(statuses: list[dict]) -> int | None:
-    status_choices = [f"{status['id']}: {status['name']}" for status in statuses]
-    choice = questionary.select("Select a new status:", choices=status_choices).ask()
+    status_choices = [f"{status['id']}: {status['name']}"
+                      for status in statuses]
+    choice = questionary.select(
+        "Select a new status:", choices=status_choices
+    ).ask()
 
     if choice:
         return int(choice.split(":")[0])

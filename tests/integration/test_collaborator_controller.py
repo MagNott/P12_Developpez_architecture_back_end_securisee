@@ -1,7 +1,6 @@
 from unittest.mock import patch
 from app.controllers.collaborator_controller import CollaboratorController
 from app.models.collaborator import Collaborator
-from app.utils.collaborator_utils import find_collaborator_by_login
 
 
 def test_signup_success(

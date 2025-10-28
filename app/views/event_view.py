@@ -9,13 +9,19 @@ from app.views.event_input_view import (
 import questionary
 from rich.console import Console
 from rich.panel import Panel
-from app.utils.contract_utils import get_contracts
 from app.validators.event_validator import is_end_date_after_start
 
 
-def get_event_info(session, connected_collaborator: Collaborator) -> dict:
+def get_event_info(
+        session,
+        filtered_contracts,
+        connected_collaborator: Collaborator
+) -> dict:
     console = Console()
-    console.print(f"[bold green]Create an event with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold green]")
+    console.print(
+        f"[bold green]Create an event with {connected_collaborator.first_name}"
+        f" {connected_collaborator.last_name} - "
+        f"{connected_collaborator.department.name}[/bold green]")
 
     dict_event = {}
 
@@ -25,16 +31,19 @@ def get_event_info(session, connected_collaborator: Collaborator) -> dict:
     dict_event["start_date"] = ask_start_date()
     dict_event["end_date"] = ask_end_date()
 
-    while not is_end_date_after_start(dict_event["start_date"], dict_event["end_date"] ):
+    while not is_end_date_after_start(
+        dict_event["start_date"], dict_event["end_date"]
+    ):
         console.print("[red]End date must be after start date.[/red]")
         dict_event["end_date"] = ask_end_date()
 
-    contracts = get_contracts(session)
-    contract_choices = [
-        f"{contract['id']}: {contract['name']}" for contract in contracts
+    filtered_contracts = [
+        f"{contract.id}: Contract for {contract.customer.first_name} "
+        f"{contract.customer.last_name}"
+        for contract in filtered_contracts
     ]
     contract_choice = questionary.select(
-        "Select contract:", choices=contract_choices
+        "Select contract:", choices=filtered_contracts
     ).ask()
     dict_event["contract_id"] = int(contract_choice.split(":")[0])
     # need to convert to int because questionary returns a string
@@ -47,28 +56,42 @@ def render_view_all_events(events, connected_collaborator: Collaborator):
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow][Event Controller] view_events() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow][Event Controller] view_events() called with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
 
     if not events:
-        console.print(Panel("[bold red]No events to display.[/bold red]", expand=False))
+        console.print(Panel(
+            "[bold red]No events to display.[/bold red]",
+            expand=False)
+        )
         console.rule("", style="bold red")
         return
     for event in events:
         console.print(
-            f"[bold green]- [/bold green] Event ID: {event.id} \
-                | location : {event.location} | Date: {event.start_date} | Client: {event.contract.customer.first_name} {event.contract.customer.last_name}"
+            f"[bold green]- [/bold green] Event ID: {event.id} "
+            f"| location : {event.location} | Date: {event.start_date} "
+            f"| Client: {event.contract.customer.first_name} "
+            f"{event.contract.customer.last_name}"
         )
     console.rule("End of event list", style="bold green")
 
 
-def render_choice_event(events, connected_collaborator: Collaborator) -> str | None:
+def render_choice_event(
+        events,
+        connected_collaborator: Collaborator
+) -> str | None:
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow][Event Controller] read_event() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow][Event Controller] read_event() called with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -80,7 +103,9 @@ def render_choice_event(events, connected_collaborator: Collaborator) -> str | N
         return None
 
     event_choices = [
-        f"{event.id}: {event.location} | {event.start_date} to {event.end_date} | Client: {event.contract.customer.first_name} {event.contract.customer.last_name}"
+        f"{event.id}: {event.location} | {event.start_date} to "
+        f"{event.end_date} | Client: {event.contract.customer.first_name} "
+        f"{event.contract.customer.last_name}"
         for event in events
     ]
     event_choice = questionary.select(
@@ -96,23 +121,39 @@ def render_view_event_details(
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow][Event Controller] Event Details with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow][Event Controller] Event Details with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
 
     console.print(f"[bold green]Event ID:[/bold green] {event_object.id}")
-    console.print(f"[bold green]Location:[/bold green] {event_object.location}")
-    console.print(f"[bold green]Attendees:[/bold green] {event_object.attendees}")
-    console.print(f"[bold green]Notes:[/bold green] {event_object.notes}")
-    console.print(f"[bold green]Start Date:[/bold green] {event_object.start_date}")
-    console.print(f"[bold green]End Date:[/bold green] {event_object.end_date}")
     console.print(
-        f"[bold green]Contract:[/bold green] {event_object.contract_id} - Client: {event_object.contract.customer.first_name} {event_object.contract.customer.last_name}"
+        f"[bold green]Location:[/bold green] {event_object.location}"
+    )
+    console.print(
+        f"[bold green]Attendees:[/bold green] {event_object.attendees}"
+    )
+    console.print(f"[bold green]Notes:[/bold green] {event_object.notes}")
+    console.print(
+        f"[bold green]Start Date:[/bold green] {event_object.start_date}"
+    )
+    console.print(
+        f"[bold green]End Date:[/bold green] {event_object.end_date}"
+    )
+    console.print(
+        f"[bold green]Contract:[/bold green] {event_object.contract_id} - "
+        f"Client: {event_object.contract.customer.first_name} "
+        f"{event_object.contract.customer.last_name}"
     )
     if event_object.collaborator_id:
         console.print(
-            f"[bold green]Collaborator ID:[/bold green] {event_object.collaborator_id} - {event_object.collaborator.first_name} {event_object.collaborator.last_name}"
+            f"[bold green]Collaborator ID:[/bold green] "
+            f"{event_object.collaborator_id} - "
+            f"{event_object.collaborator.first_name} "
+            f"{event_object.collaborator.last_name}"
         )
 
     console.rule("End of event details", style="bold green")
@@ -125,14 +166,17 @@ def render_choice_support_collaborator(
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow][Event Controller] Select Support Collaborator with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow][Event Controller] Select Support Collaborator "
+            f"with {connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
 
     collaborator_choices = [
-        f"{collaborator['id']}: {collaborator['name']} - {collaborator['departement']}"
-        for collaborator in support_collaborators
+        f"{coll['id']}: {coll['name']} - {coll['department']}"
+        for coll in support_collaborators
     ]
     collaborator_choice = questionary.select(
         "Select a support collaborator:", choices=collaborator_choices
@@ -144,7 +188,10 @@ def render_view_my_events(events, connected_collaborator: Collaborator):
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow][Event Controller] display_my_events() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow][Event Controller] display_my_events() called with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -156,8 +203,10 @@ def render_view_my_events(events, connected_collaborator: Collaborator):
         return
     for event in events:
         console.print(
-            f"[bold green]- [/bold green] Event ID: {event.id} \
-                | location : {event.location} | Date: {event.start_date} | Client: {event.contract.customer.first_name} {event.contract.customer.last_name}"
+            f"[bold green]- [/bold green] Event ID: {event.id} "
+            f" | location : {event.location} | Date: {event.start_date} | "
+            f"Client: {event.contract.customer.first_name} "
+            f"{event.contract.customer.last_name}"
         )
     console.rule("End of my event list", style="bold green")
 
@@ -194,7 +243,8 @@ def show_events_without_support_collaborator(events):
     console = Console()
     console.print(
         Panel(
-            "[bold yellow][Event Controller] Events without Support Collaborator[/bold yellow]",
+            "[bold yellow][Event Controller] Events without Support "
+            "Collaborator[/bold yellow]",
             expand=False,
         )
     )
@@ -214,7 +264,8 @@ def show_assigned_event_success():
     console = Console()
     console.print(
         Panel(
-            "[bold green]Support collaborator assigned to event successfully![/bold green]",
+            "[bold green]Support collaborator assigned to event successfully!"
+            "[/bold green]",
             expand=False,
         )
     )
@@ -224,7 +275,30 @@ def show_assigned_event_error():
     console = Console()
     console.print(
         Panel(
-            "[bold red]Error assigning support collaborator to event.[/bold red]",
+            "[bold red]Error assigning support collaborator to event."
+            "[/bold red]",
+            expand=False,
+        )
+    )
+
+
+def show_no_signed_contracts_available():
+    console = Console()
+    console.print(
+        Panel(
+            "[bold red]No signed contracts available for your clients."
+            "[/bold red]",
+            expand=False,
+        )
+    )
+
+
+def show_no_contracts_available():
+    console = Console()
+    console.print(
+        Panel(
+            "[bold red]No signed contracts available for your clients."
+            "[/bold red]",
             expand=False,
         )
     )

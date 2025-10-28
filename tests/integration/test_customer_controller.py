@@ -177,7 +177,10 @@ def test_read_customer_success(
             authenticated_user.department.name
         customer_controller.read_customer()
 
-    mock_render_read.assert_called_once_with(fake_customers[0], authenticated_user)
+    mock_render_read.assert_called_once_with(
+        fake_customers[0],
+        authenticated_user
+    )
 
 
 def test_read_customer_failure_no_auth(

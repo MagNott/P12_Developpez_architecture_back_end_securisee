@@ -1,6 +1,5 @@
 from unittest.mock import patch
 from app.controllers.contract_controller import ContractController
-from tests.conftest import department_management
 
 
 def test_view_contract_success(
@@ -327,3 +326,193 @@ def test_modify_contract_failure_no_auth(
         contract_controller.modify_contract()
 
     mock_render_error.assert_called_once()
+
+
+def test_filter_contracts_by_status_unsigned_success(
+    db_session,
+    fake_contracts,
+    fake_collaborators,
+):
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+
+    authenticated_user = fake_collaborators[2]  # Sales department
+
+    patch_render_choice_status = patch(
+        "app.controllers.contract_controller.render_choice_status_contracts",
+        return_value="1: Unsigned",
+    )
+    patch_render = patch(
+        "app.controllers.contract_controller.render_view_all_contracts"
+    )
+
+    with (
+        patch_session
+    ), (
+        patch_render_choice_status
+    ), patch_render as mock_render:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.authenticated_collaborator = authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
+        contract_controller.filter_contracts_by_status()
+
+    mock_render.assert_called_once_with(
+        [fake_contracts[0]],
+        authenticated_user
+    )
+
+
+def test_filter_contract_no_auth(
+    db_session,
+):
+    # no authenticated user so access should be denied
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        contract_controller.filter_contracts_by_status()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_filter_contracts_by_status_not_sales(
+    db_session,
+    fake_collaborators,
+):
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+
+    authenticated_user = fake_collaborators[1]  # Support department
+
+    patch_render_choice_status = patch(
+        "app.controllers.contract_controller.render_choice_status_contracts",
+        return_value="1: Unsigned",
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), (
+        patch_render_choice_status
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
+        contract_controller.filter_contracts_by_status()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_filter_contracts_not_fully_paid(
+    db_session,
+    fake_contracts,
+    fake_collaborators,
+):
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+
+    authenticated_user = fake_collaborators[2]  # Sales department
+
+    patch_render = patch(
+        "app.controllers.contract_controller.render_view_all_contracts"
+    )
+
+    with (
+        patch_session
+    ), patch_render as mock_render:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.authenticated_collaborator = authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
+
+        contract_controller.filter_contracts_not_fully_paid()
+
+    mock_render.assert_called_once_with(
+        [fake_contracts[0], fake_contracts[1]],
+        authenticated_user
+    )
+
+
+def test_filter_contracts_not_fully_paid_no_auth(
+    db_session,
+):
+    # no authenticated user so access should be denied
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+    patch_render_access_denied = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        contract_controller.filter_contracts_not_fully_paid()
+
+    mock_render_access_denied.assert_called_once()
+
+
+def test_filter_contracts_not_fully_paid_not_sales(
+    db_session,
+    fake_collaborators,
+):
+    contract_controller = ContractController()
+
+    patch_session = patch(
+        "app.controllers.contract_controller.Session",
+        return_value=db_session
+    )
+
+    authenticated_user = fake_collaborators[1]  # Support department
+
+    patch_render_access_denied = patch(
+        "app.controllers.contract_controller.render_access_denied"
+    )
+
+    with (
+        patch_session
+    ), patch_render_access_denied as mock_render_access_denied:
+
+        contract_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        contract_controller.permission.department = \
+            authenticated_user.department.name
+
+        contract_controller.filter_contracts_not_fully_paid()
+
+    mock_render_access_denied.assert_called_once()

@@ -1,4 +1,7 @@
+from app.models.collaborator import Collaborator
+from app.models.contract import Contract
 from app.permissions.permission import Permission
+from app.utils.contract_utils import get_contracts
 from app.views.event_input_view import ask_event_modification
 from app.views.menu_view import render_access_denied
 from db import Session
@@ -17,16 +20,16 @@ from app.views.event_view import (
     show_assigned_event_success,
     show_assigned_event_error,
     render_view_my_events,
+    show_no_signed_contracts_available,
 )
 from app.utils.database_utils import commit_to_db
-from app.utils.collaborator_utils import get_collaborators
-from app.views.user_input_view import ask_first_name
+from app.utils.collaborator_utils import get_collaborators_by_department
 
 
 class EventController:
     def __init__(self):
         self.permission = Permission()
-        self.authenticated_collaborator = self.permission.authenticated_collaborator
+        self.authenticated_collaborator: Collaborator = self.permission.authenticated_collaborator  # noqa
 
     def view_events(self):
         if not self.permission.can_read():
@@ -50,8 +53,20 @@ class EventController:
         session = Session()
 
         try:
+            contracts: list[Contract] = get_contracts(session)
+            # filter by status 'signed' and by self.authenticated_collaborator
+            filtered_contracts = [
+                contract for contract in contracts
+                if contract.status.name == 'Signed'
+                and contract.customer.commercial_id
+                == self.authenticated_collaborator.id
+            ]
+            if not filtered_contracts:
+                show_no_signed_contracts_available()
+                return
+
             event_info = get_event_info(
-                session,
+                session, filtered_contracts,
                 self.authenticated_collaborator
             )
             event = Event(
@@ -133,7 +148,7 @@ class EventController:
             )
             if not event_object:
                 return
-            if not event_object.collaborator_id == self.authenticated_collaborator.id:  # type: ignore
+            if not event_object.collaborator_id == self.authenticated_collaborator.id:  # type: ignore  # noqa: E501
                 render_access_denied()
                 return
 
@@ -162,10 +177,14 @@ class EventController:
         session = Session()
         try:
             events_without_support = (
-                session.query(Event).filter(Event.collaborator_id == None).all()
+                session.query(Event).filter(
+                    Event.collaborator_id.is_(None)
+                ).all()
             )
             if not events_without_support:
-                show_events_without_support_collaborator(events_without_support)
+                show_events_without_support_collaborator(
+                    events_without_support
+                )
                 return
             event_choice = render_choice_event(
                 events_without_support,
@@ -182,7 +201,7 @@ class EventController:
             if not event_object:
                 return
 
-            collaborators = get_collaborators(session)
+            collaborators = get_collaborators_by_department(session)
             support_collaborators = [
                 collaborator
                 for collaborator in collaborators
@@ -216,7 +235,7 @@ class EventController:
         try:
             events = (
                 session.query(Event)
-                .filter(Event.collaborator_id == self.authenticated_collaborator.id)
+                .filter(Event.collaborator_id == self.authenticated_collaborator.id)  # noqa: E501
                 .all()
             )
             render_view_my_events(events, self.authenticated_collaborator)

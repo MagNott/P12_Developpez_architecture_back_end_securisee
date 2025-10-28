@@ -20,6 +20,8 @@ VIEW_CONTRACTS = "View Contracts"
 MODIFY_CONTRACT = "Modify Contract"
 READ_CONTRACT = "Read contract"
 MODIFY_CONTRACT = "Modify contract"
+FILTER_CONTRACTS_BY_STATUS = "Filter contracts by status"
+FILTER_CONTRACTS_NOT_FULLY_PAID = "Filter contracts not fully paid"
 
 READ_EVENT = "Read event"
 DISPLAY_MY_EVENTS = "Display my events"

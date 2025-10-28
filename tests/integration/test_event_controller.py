@@ -18,11 +18,13 @@ def test_view_events_success(
                          "render_view_all_events")
 
     with patch_session, patch_render as mock_render:
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
+        )
         event_controller.authenticated_collaborator = authenticated_user
-        event_controller.permission.department = \
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.view_events()
 
     mock_render.assert_called_once_with(fake_events, authenticated_user)
@@ -41,9 +43,8 @@ def test_view_events_failure_no_auth(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
         event_controller.view_events()
 
@@ -70,14 +71,16 @@ def test_create_event_success(
         "app.controllers.event_controller.show_created_event_success"
     )
 
-    with (
-        patch_session
-    ), patch_get_info, patch_render_success as mock_render_success:
+    with patch_session, patch_get_info, \
+            patch_render_success as mock_render_success:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
-        event_controller.permission.department = \
+        )
+        event_controller.authenticated_collaborator = authenticated_user
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.create_event()
 
     mock_render_success.assert_called_once()
@@ -96,9 +99,8 @@ def test_create_event_failure_no_auth(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
         event_controller.create_event()
 
@@ -121,23 +123,24 @@ def test_create_event_failure_wrong_department(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
-        event_controller.permission.department = \
+        )
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.create_event()
 
     mock_render_access_denied.assert_called_once()
 
 
 def test_read_events_success(
-        db_session,
-        fake_collaborators,
-        fake_events,
+    db_session,
+    fake_collaborators,
+    fake_events,
 ):
     event_controller = EventController()
 
@@ -155,17 +158,16 @@ def test_read_events_success(
         return_value="Event details for Event 1",
     )
 
-    with (
-        patch_session
-    ), (
-        patch_render
-    ), patch_render_details as mock_render_details:
+    with patch_session, patch_render, \
+            patch_render_details as mock_render_details:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
+        )
         event_controller.authenticated_collaborator = authenticated_user
-        event_controller.permission.department = \
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.read_event()
 
     mock_render_details.assert_called_once_with(
@@ -187,9 +189,8 @@ def test_read_events_failure_no_auth(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
         event_controller.read_event()
 
@@ -224,15 +225,15 @@ def test_modify_event_success(
         patch_session
     ), (
         patch_render
-    ), (
-        patch_ask_modification
-    ), patch_render_success as mock_render_success:
+    ), patch_ask_modification, patch_render_success as mock_render_success:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
+        )
         event_controller.authenticated_collaborator = authenticated_user
-        event_controller.permission.department = \
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.modify_event()
 
     mock_render_success.assert_called_once()
@@ -251,9 +252,8 @@ def test_modify_event_failure_no_auth(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
         event_controller.modify_event()
 
@@ -289,15 +289,16 @@ def test_modify_event_failure_not_dedicated_collaborator(
         patch_session
     ), (
         patch_render
-    ), (
-        patch_ask_modification
-    ), patch_render_access_denied as mock_render_access_denied:
+    ), patch_ask_modification, \
+            patch_render_access_denied as mock_render_access_denied:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
+        )
         event_controller.authenticated_collaborator = authenticated_user
-        event_controller.permission.department = \
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.modify_event()
 
     mock_render_access_denied.assert_called_once()
@@ -325,7 +326,11 @@ def test_assign_event_success(
     )
     patch_choice_collaborators = patch(
         "app.controllers.event_controller.render_choice_support_collaborator",
-        return_value=f"{fake_collaborators[1].id}: {fake_collaborators[1].first_name} {fake_collaborators[1].last_name}",
+        return_value=(
+            f"{fake_collaborators[1].id}: "
+            f"{fake_collaborators[1].first_name} "
+            f"{fake_collaborators[1].last_name}"
+        ),
     )
     patch_render_success = patch(
         "app.controllers.event_controller.show_assigned_event_success"
@@ -339,11 +344,13 @@ def test_assign_event_success(
         patch_render_collaborator
     ), patch_choice_collaborators, patch_render_success as mock_render_success:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
+        )
         event_controller.authenticated_collaborator = authenticated_user
-        event_controller.permission.department = \
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.assign_support_collaborator_to_event()
 
     mock_render_success.assert_called_once()
@@ -362,9 +369,8 @@ def test_assign_event_failure_no_auth(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
         event_controller.assign_support_collaborator_to_event()
 
@@ -375,7 +381,8 @@ def test_assign_event_failure_not_management(
     db_session,
     fake_collaborators,
 ):
-    # authenticated user is not in Management department so access should be denied
+    # authenticated user is not in Management department so access
+    # should be denied
     event_controller = EventController()
 
     authenticated_user = fake_collaborators[1]  # Support department
@@ -387,14 +394,15 @@ def test_assign_event_failure_not_management(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
-        event_controller.permission.department = \
+        )
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.assign_support_collaborator_to_event()
 
     mock_render_access_denied.assert_called_once()
@@ -417,14 +425,18 @@ def test_display_my_events_success(
 
     with patch_session, patch_render as mock_render:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
+        )
         event_controller.authenticated_collaborator = authenticated_user
-        event_controller.permission.department = \
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.display_my_events()
 
-    mock_render.assert_called_once_with([fake_events[0], fake_events[2]], authenticated_user)
+    mock_render.assert_called_once_with(
+        [fake_events[0], fake_events[2]], authenticated_user
+    )
 
 
 def test_display_my_events_failure_no_auth(
@@ -440,9 +452,8 @@ def test_display_my_events_failure_no_auth(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
         event_controller.display_my_events()
 
@@ -466,14 +477,15 @@ def test_display_my_events_failure_not_support(
         "app.controllers.event_controller.render_access_denied"
     )
 
-    with (
-        patch_session
-    ), patch_render_access_denied as mock_render_access_denied:
+    with patch_session, \
+            patch_render_access_denied as mock_render_access_denied:
 
-        event_controller.permission.authenticated_collaborator = \
+        event_controller.permission.authenticated_collaborator = (
             authenticated_user
-        event_controller.permission.department = \
+        )
+        event_controller.permission.department = (
             authenticated_user.department.name
+        )
         event_controller.display_my_events()
 
     mock_render_access_denied.assert_called_once()

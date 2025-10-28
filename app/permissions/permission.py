@@ -30,7 +30,6 @@ class Permission:
         )
 
     def can_modify_contract(self):
-        print(f"Permission check: Authenticated={self.is_collaborator_authenticated()}, Department={self.department}")
         return self.is_collaborator_authenticated() and self.department in [
             MANAGEMENT,
             SALES,
@@ -97,3 +96,11 @@ class Permission:
             self.is_collaborator_authenticated()
             and self.department == MANAGEMENT
         )
+
+    def can_filter_contracts_by_status(self):
+        return bool(self.is_collaborator_authenticated()
+                    and self.department == SALES)
+
+    def can_filter_contracts_not_fully_paid(self):
+        return bool(self.is_collaborator_authenticated()
+                    and self.department == SALES)

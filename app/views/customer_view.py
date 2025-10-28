@@ -15,7 +15,10 @@ from app.views.customer_input_view import ask_company_name
 def get_customer_info(connected_collaborator: Collaborator) -> dict:
     console = Console()
     console.print(
-        f"[bold green]Create a customer with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold green]")
+        f"[bold green]Create a customer with "
+        f"{connected_collaborator.first_name} "
+        f"{connected_collaborator.last_name} - "
+        f"{connected_collaborator.department.name}[/bold green]")
 
     dict_customer_user = {}
 
@@ -33,7 +36,10 @@ def render_view_all_customers(customers: list[Customer],
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow][Customer Controller] view_customers() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow][Customer Controller] view_customers() called with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -55,11 +61,17 @@ def render_view_all_customers(customers: list[Customer],
     console.rule("End of customer list", style="bold green")
 
 
-def render_choice_customer(customers: list[Customer], connected_collaborator: Collaborator) -> str | None:
+def render_choice_customer(
+        customers: list[Customer],
+        connected_collaborator: Collaborator
+) -> str | None:
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow][Customer Controller] read_customers() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow][Customer Controller] read_customers() called with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -74,7 +86,9 @@ def render_choice_customer(customers: list[Customer], connected_collaborator: Co
         console.rule("", style="bold red")
         return
     customer_choices = [
-        f"{customer.id}: {customer.first_name} {customer.last_name} of sales collaborator: {customer.collaborator.first_name} {customer.collaborator.last_name}"
+        f"{customer.id}: {customer.first_name} {customer.last_name} of sales "
+        f"collaborator: {customer.collaborator.first_name} "
+        f"{customer.collaborator.last_name}"
         for customer in customers
     ]
     customer_choice = questionary.select(
@@ -83,11 +97,17 @@ def render_choice_customer(customers: list[Customer], connected_collaborator: Co
     return customer_choice
 
 
-def render_read_customer(customer_object, connected_collaborator: Collaborator):
+def render_read_customer(
+        customer_object,
+        connected_collaborator: Collaborator
+):
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow][Customer Controller] read_customers() called with {connected_collaborator.first_name} {connected_collaborator.last_name} - {connected_collaborator.department.name}[/bold yellow]",
+            f"[bold yellow][Customer Controller] read_customers() called with "
+            f"{connected_collaborator.first_name} "
+            f"{connected_collaborator.last_name} - "
+            f"{connected_collaborator.department.name}[/bold yellow]",
             expand=False,
         )
     )
@@ -100,7 +120,7 @@ def render_read_customer(customer_object, connected_collaborator: Collaborator):
             ))
         console.rule("", style="bold red")
         return
-    console.print(f"[bold green]Customer Details:[/bold green]")
+    console.print("[bold green]Customer Details:[/bold green]")
     console.print(f"ID: {customer_object.id}")
     console.print(f"First Name: {customer_object.first_name}")
     console.print(f"Last Name: {customer_object.last_name}")

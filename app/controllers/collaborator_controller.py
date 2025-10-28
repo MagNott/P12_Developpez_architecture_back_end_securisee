@@ -1,4 +1,3 @@
-from typing import cast
 from app.views.collaborator_view import (
     get_signup_info,
     show_cannot_delete_self,
@@ -7,7 +6,9 @@ from app.views.collaborator_view import (
     show_signup_success,
     show_signup_error,
     show_error_commiting_to_db,
-    render_choice_collaborator
+    render_choice_collaborator,
+    show_delete_error,
+    show_delete_success,
 )
 from app.models.collaborator import Collaborator
 from app.utils.password_utils import hash_password
@@ -29,13 +30,16 @@ from db import Session
 class CollaboratorController:
     def __init__(self):
         self.permission = Permission()
-        self.authenticated_collaborator = self.permission.authenticated_collaborator
+        self.authenticated_collaborator: Collaborator = self.permission.authenticated_collaborator  # noqa: E501
 
     def signup(self):
         session = Session()
 
         try:
-            user_info = get_signup_info(self.authenticated_collaborator)
+            user_info = get_signup_info(
+                session,
+                self.authenticated_collaborator
+            )
             hashed_password = hash_password(user_info["password"])
 
             collaborator = Collaborator(
@@ -96,7 +100,10 @@ class CollaboratorController:
         session = Session()
 
         try:
-            user_info = get_signup_info(self.authenticated_collaborator)
+            user_info = get_signup_info(
+                session,
+                self.authenticated_collaborator
+            )
             hashed_password = hash_password(user_info["password"])
 
             collaborator = Collaborator(
@@ -134,12 +141,17 @@ class CollaboratorController:
 
             collaborator_object = (
                 session.query(Collaborator)
-                .filter(Collaborator.id == int(collaborator_choice.split(":")[0]))
+                .filter(
+                    Collaborator.id == int(collaborator_choice.split(":")[0])
+                )
                 .first())
             if not collaborator_object:
                 return
 
-            collaborator_updated = ask_collaborator_modification(collaborator_object)
+            collaborator_updated = ask_collaborator_modification(
+                session,
+                collaborator_object
+            )
             if not collaborator_updated:
                 return
 
@@ -172,21 +184,25 @@ class CollaboratorController:
 
             collaborator_object = (
                 session.query(Collaborator)
-                .filter(Collaborator.id == int(collaborator_choice.split(":")[0]))
+                .filter(
+                    Collaborator.id == int(collaborator_choice.split(":")[0])
+                )
                 .first())
             if not collaborator_object:
                 return
 
-            # Help for Pylance - import cast from typing
-            if collaborator_object.id == self.authenticated_collaborator.id:  # type: ignore
+            if collaborator_object.id == self.authenticated_collaborator.id:  # type: ignore  # noqa: E501
                 show_cannot_delete_self()
                 return
 
             if not collaborator_object:
                 return
-            confirm = ask_confirm_delete(collaborator_object)
-            if not confirm:
-                return
+
+            if ask_confirm_delete(collaborator_object):
+                show_delete_success()
+            else:
+                show_delete_error()
+
             session.delete(collaborator_object)
             session.commit()
             return True

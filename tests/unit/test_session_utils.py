@@ -45,7 +45,6 @@ def test_get_authenticated_department_no_auth(mock_is_authenticated_no_auth):
 
 def test_is_authenticated_success(
         mock_file,
-        mock_query,
         fake_management_collaborator
 ):
     token = generate_token(fake_management_collaborator)

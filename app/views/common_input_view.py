@@ -1,10 +1,15 @@
+import questionary
 from rich.console import Console
 
 
 def ask_if_update(field_name: str, current_value: str) -> bool:
     console = Console()
     console.print(f"Current {field_name}: {current_value}")
-    answer = input(f"Modify {field_name}? (y/N): ").lower()
-    # Default to 'N' if the user just presses Enter because it's not y
+    # answer = input(f"Modify {field_name}? (y/N): ").lower()
+    # # Default to 'N' if the user just presses Enter because it's not y
+    response = questionary.confirm(
+        f"Do you want to update {field_name}? (Current: {current_value})",
+        default=False
+    ).ask()
 
-    return answer == "y"
+    return response

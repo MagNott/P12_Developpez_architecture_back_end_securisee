@@ -21,10 +21,10 @@ def generate_token(collaborator: Collaborator) -> str:
     Returns:
         str: The generated JWT token
     """
-    today = datetime.datetime.now()
+    today = datetime.datetime.now(datetime.timezone.utc)
     payload = {
         "login": collaborator.login,
-        "exp": today + datetime.timedelta(minutes=1),
+        "exp": (today + datetime.timedelta(minutes=50)).timestamp(),
         "department": collaborator.department.name,
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")

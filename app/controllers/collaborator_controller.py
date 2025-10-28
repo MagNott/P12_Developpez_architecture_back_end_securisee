@@ -155,6 +155,10 @@ class CollaboratorController:
             if not collaborator_updated:
                 return
 
+            if "password" in collaborator_updated:
+                hashed_password = hash_password(collaborator_updated["password"])
+                collaborator_updated["password"] = hashed_password
+
             for key, value in collaborator_updated.items():
                 setattr(collaborator_object, key, value)
 

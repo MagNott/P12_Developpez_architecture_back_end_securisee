@@ -1,3 +1,4 @@
+from app.utils.security_utils import hash_anonymize
 from app.views.collaborator_view import (
     get_signup_info,
     show_cannot_delete_self,
@@ -25,6 +26,7 @@ from app.utils.session_utils import generate_token, save_token
 from app.permissions.permission import Permission
 from app.views.menu_view import render_access_denied
 from db import Session
+import sentry_sdk
 
 
 class CollaboratorController:
@@ -53,6 +55,15 @@ class CollaboratorController:
             )
 
             if commit_to_db(session, collaborator):
+                id_collaborator_anonimized_created = hash_anonymize(
+                        str(collaborator.id)
+                    )
+                sentry_sdk.capture_message(
+                    f"New collaborator created: "
+                    f"{id_collaborator_anonimized_created} "
+                    f"by himself/herself."
+                )
+                sentry_sdk.flush()
                 show_signup_success()
             else:
                 show_signup_error()
@@ -117,6 +128,18 @@ class CollaboratorController:
             )
 
             if commit_to_db(session, collaborator):
+                id_collaborator_anonimized_created = hash_anonymize(
+                        str(collaborator.id)
+                    )
+                id_collaborator_anonimized = hash_anonymize(
+                        str(self.authenticated_collaborator.id)
+                    )
+                sentry_sdk.capture_message(
+                    f"New collaborator created: "
+                    f"{id_collaborator_anonimized_created} "
+                    f"by {id_collaborator_anonimized}."
+                )
+                sentry_sdk.flush()
                 show_signup_success()
             else:
                 show_signup_error()
@@ -156,13 +179,24 @@ class CollaboratorController:
                 return
 
             if "password" in collaborator_updated:
-                hashed_password = hash_password(collaborator_updated["password"])
+                hashed_password = hash_password(collaborator_updated["password"])  # noqa: E501
                 collaborator_updated["password"] = hashed_password
 
             for key, value in collaborator_updated.items():
                 setattr(collaborator_object, key, value)
 
             if commit_to_db(session, collaborator_object):
+                id_collaborator_anonimized_modified = hash_anonymize(
+                        str(collaborator_object.id)
+                    )
+                id_collaborator_anonimized = hash_anonymize(
+                        str(self.authenticated_collaborator.id)
+                    )
+                sentry_sdk.capture_message(
+                    f"Collaborator modified: "
+                    f"{id_collaborator_anonimized_modified}"
+                    f" by {id_collaborator_anonimized}."
+                )
                 show_signup_success()
             else:
                 show_signup_error()
@@ -215,6 +249,7 @@ class CollaboratorController:
             # rollback prevents issues if something was implicitly flushed.
             session.rollback()
             show_error_commiting_to_db(e)
+            sentry_sdk.capture_exception(e)
             return False
         finally:
             session.close()

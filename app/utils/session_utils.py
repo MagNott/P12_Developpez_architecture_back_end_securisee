@@ -6,9 +6,18 @@ from app.utils.collaborator_utils import find_collaborator_by_login
 from app.models.collaborator import Collaborator
 from app.models.department import Department
 from db import Session
+import sentry_sdk
 
-# NEED TO PROTECT THE SECRET KEY BETTER AFTER
-SECRET_KEY = "ma_cle_secrete"
+try:
+    secret_key = os.getenv("SECRET_KEY")
+    if not secret_key:
+        raise ValueError("SECRET_KEY environment variable is not set.")
+except ValueError as e:
+    sentry_sdk.capture_exception(e)
+    sentry_sdk.flush()
+    raise
+
+SECRET_KEY = secret_key
 SESSION_FILE = ".session"
 
 
@@ -69,7 +78,8 @@ def is_authenticated() -> Collaborator | bool:
         if not collaborator:
             return False
         return collaborator
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
+        sentry_sdk.capture_exception(e)
         return False
 
 

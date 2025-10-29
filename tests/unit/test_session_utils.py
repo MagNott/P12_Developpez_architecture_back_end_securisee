@@ -4,6 +4,7 @@ from app.utils.session_utils import (
     save_token,
 )
 import datetime
+import os
 import jwt
 from app.utils.session_utils import is_authenticated
 from unittest.mock import mock_open, patch
@@ -11,7 +12,7 @@ from unittest.mock import mock_open, patch
 
 def test_generate_token_success(fake_management_collaborator):
     token = generate_token(fake_management_collaborator)
-    decoded = jwt.decode(token, "ma_cle_secrete", algorithms=["HS256"])
+    decoded = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
 
     assert token is not None
     assert isinstance(token, str)

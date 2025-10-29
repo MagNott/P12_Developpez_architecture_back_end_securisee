@@ -2,6 +2,7 @@ from app.models.customer import Customer
 from app.permissions.permission import Permission
 from app.models.contract import Contract
 from app.utils.contract_utils import get_contracts
+from app.utils.security_utils import hash_anonymize
 from app.views.customer_view import render_choice_customer
 from app.views.menu_view import render_access_denied
 from db import Session
@@ -25,6 +26,7 @@ from app.utils.constants import MANAGEMENT, SALES
 from app.models.collaborator import Collaborator
 from app.views.event_view import show_no_contracts_available
 from app.utils.status_utils import get_statuses
+import sentry_sdk
 
 
 class ContractController:
@@ -204,6 +206,23 @@ class ContractController:
             )
             if not contract_updated:
                 return
+
+            if contract_updated.get("status_id"):
+                for status in statuses:
+                    if status["id"] == contract_updated["status_id"]:
+                        selected_status_name = status["name"]
+                        break
+
+                if (selected_status_name == "Signed" and current_status.name != "Signed"):  # noqa: E501
+                    id_contract_anonimized = hash_anonymize(str(contract_object.id))  # noqa: E501
+                    id_collaborator_anonimized = hash_anonymize(
+                        str(self.authenticated_collaborator.id)
+                    )
+                    sentry_sdk.capture_message(  #
+                        f"Contract ID {id_contract_anonimized} marked as Signed "  # noqa: E501
+                        f"by Collaborator ID "
+                        f"{id_collaborator_anonimized}"
+                    )
 
             # Apply updates to the contract object
             for key, value in contract_updated.items():

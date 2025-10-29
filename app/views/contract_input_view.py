@@ -51,7 +51,6 @@ def ask_contract_modification(
 
     if ask_if_update("contract amount", str(contract_object.contract_amount)):
         contract_updated["contract_amount"] = ask_contract_amount()
-
     if ask_if_update("amount due", str(contract_object.amount_due)):
         contract_updated["amount_due"] = ask_contract_amount_due()
     if ask_if_update("status", str(current_status.name)):

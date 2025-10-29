@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 import datetime
@@ -14,6 +15,11 @@ from app.models.event import Event  # noqa: E402
 from sqlalchemy import create_engine  # noqa: E402
 from sqlalchemy.orm import sessionmaker  # noqa: E402
 from db import BaseModel  # noqa: E402
+
+
+os.environ["PEPPER"] = "TestPepper123"
+os.environ["SECRET_KEY"] = "TestSecretKey"
+os.environ["SENTRY_DSN"] = "https://fake@sentry.io/123"
 
 
 @pytest.fixture

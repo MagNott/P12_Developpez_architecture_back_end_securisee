@@ -187,6 +187,8 @@ def test_create_collaborator_success(
 
         collaborator_controller.permission.authenticated_collaborator = \
             authenticated_user
+        collaborator_controller.authenticated_collaborator = \
+            authenticated_user
         collaborator_controller.permission.department = \
             authenticated_user.department.name
         collaborator_controller.create_collaborator()
@@ -286,6 +288,8 @@ def test_modify_collaborator_success(
         patch_ask_modify
     ), patch_show_success as mock_show_success:
         collaborator_controller.permission.authenticated_collaborator = \
+            authenticated_user
+        collaborator_controller.authenticated_collaborator = \
             authenticated_user
         collaborator_controller.permission.department = \
             authenticated_user.department.name

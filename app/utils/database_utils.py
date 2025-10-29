@@ -1,3 +1,4 @@
+import sentry_sdk
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -17,4 +18,5 @@ def commit_to_db(session, model_instance: DeclarativeBase) -> bool:
         # rollback prevents issues if something was implicitly flushed.
         session.rollback()
         print(f"Error committing to database: {e}")
+        sentry_sdk.capture_exception(e)
         return False

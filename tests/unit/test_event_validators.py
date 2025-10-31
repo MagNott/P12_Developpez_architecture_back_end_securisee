@@ -4,6 +4,7 @@ from app.validators.event_validator import (
     is_valid_date,
     is_valid_location,
     is_valid_notes,
+    is_valid_start_date,
 
 )
 
@@ -33,6 +34,13 @@ def test_valid_date_format():
     assert is_valid_date("20-05-2023") is False
     assert is_valid_date("2023/05/20") is False
     assert is_valid_date("not a date") is False
+
+
+def test_valid_start_date():
+    assert is_valid_start_date("2023-05-20") is True
+    assert is_valid_start_date("2022-05-20") is False
+    assert is_valid_start_date("2023-05-32") is False
+    assert is_valid_start_date("not a date") is False
 
 
 def test_end_date_after_start():

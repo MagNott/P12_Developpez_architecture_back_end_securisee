@@ -18,7 +18,7 @@ def get_signup_info(session, connected_collaborator: Collaborator) -> dict:
     console = Console()
     console.print(
         Panel(
-            f"[bold yellow]Sign Up called [/bold yellow]",
+            "[bold yellow]Sign Up called [/bold yellow]",
             expand=False,
         )
     )
@@ -104,6 +104,18 @@ def show_signin_error():
     )
 
 
+def show_modified_success():
+    console = Console()
+    console.print("[bold green]Collaborator modified successfully!"
+                  "[/bold green]")
+
+
+def show_modified_error():
+    console = Console()
+    console.print("[bold red]Error during collaborator modification. "
+                  "Try again.[/bold red]")
+
+
 def show_error_commiting_to_db(e):
     console = Console()
     console.print(
@@ -132,3 +144,8 @@ def show_delete_error():
     console.print(
         "[bold red]Error deleting collaborator. Try again.[/bold red]"
     )
+
+
+def show_log_out_success():
+    console = Console()
+    console.print("[bold green]Log out successful![/bold green]")

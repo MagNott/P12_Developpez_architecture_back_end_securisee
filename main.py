@@ -13,12 +13,7 @@ sentry_sdk.init(
 )
 
 from app.controllers.menu_controller import action_main_menu  # noqa: E402
-from app.permissions.permission import Permission  # noqa: E402
 
 
 if __name__ == "__main__":
-    if Permission().is_collaborator_authenticated():
-        from app.controllers.menu_controller import department_menu
-        department_menu()
-    else:
-        action_main_menu()
+    action_main_menu()

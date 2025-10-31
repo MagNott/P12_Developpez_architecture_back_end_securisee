@@ -38,7 +38,8 @@ def get_event_info(
         dict_event["end_date"] = ask_end_date()
 
     filtered_contracts = [
-        f"{contract.id}: Contract for {contract.customer.first_name} "
+        f"{contract.id}: Contract for {contract.customer.company_name} - "
+        f"{contract.customer.first_name} "
         f"{contract.customer.last_name}"
         for contract in filtered_contracts
     ]

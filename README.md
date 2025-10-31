@@ -9,9 +9,6 @@ It allows a company to manage its collaborators, customers, contracts, and event
 The application uses a PostgreSQL database, SQLAlchemy for ORM, and JWT for user authentication.  
 It follows best practices in code architecture and access control, providing a clear separation of concerns and reusable utilities.
 
-## Features
-
-Liste des fonctionnalités principales du projet.
 
 ## Installation
 
@@ -63,8 +60,71 @@ Liste des fonctionnalités principales du projet.
 
    ### ⚠️ The real environmental variables to use are provided to the mentor evaluator in the deliverable. ⚠️
 
+## Setup Database
 
-## Usage
+Install the postegreSQL driver avec :
+
+```bach
+pip install psycopg2-binary
+```
+
+Connect to postegreSQL :
+```bash
+psql -U postgres
+```
+
+Create a user (instead of the default postgres superuser): 
+```sql
+CREATE USER <user_name> WITH PASSWORD <motdepasse>;
+```
+
+### Create database
+
+Create, name your database and set the new user as owner:
+
+```sql
+CREATE DATABASE <database_name> OWNER <username>;
+```
+
+Grant grant all privileges (this is usually done automatically if the user is the owner, but it’s safer to include it):
+```sql
+GRANT ALL PRIVILEGES ON DATABASE <database_name> TO <username>;
+```
+
+### Configure your environnement
+
+Set the DATABASE_URL environment variable with your database credentials:
+
+>For Linux/MacOS
+>```bash
+>export DATABASE_URL="postgresql+psycopg2://<username>:<password>@localhost:5432/<database_name>"
+>```
+
+>For Windows
+>```shell
+>setx DATABASE_URL "postgresql+psycopg2://<username>:<password>@localhost:5432/<database_name>"
+>```
+
+### Create tables
+
+There are 2 ways to create tables : 
+   - Option 1: Run the SQL script manually: 
+      - SQL/schema.sql
+      - This file contains the SQL commands to create all necessary tables and relationships.
+ - Option 2: Launch the project using the init_db.py script
+      - Make sure your DATABASE_URL environment variable is correctly set before.
+
+### Populate
+
+📄 SQL/seed.sql
+
+   - This file contains example data to populate the tables (e.g., collaborators, customers, contracts).
+      - ⚠️  All the collaborators have this password in order to facilitate using and functionnal tests : Test123@4567
+ - These script is optional. If you prefer, you can also use the "Sign up" feature to manually create the first user from the CLI interface.
+
+
+
+## Usage and Features
 
 To start the application, run the following command:
 
@@ -74,23 +134,55 @@ python main.py
 
 Once launched, you will see a menu with the following options:
 
-- Sign in: Log in with your credentials to access features based on your department.
-- Sign up: Register a new collaborator account (requires department ID).
-- Log out: Exit the current session securely.
+- Sign in:
+   - Log in with your credentials to access features based on your department.
+- Sign up: Self-register.
+   - This option allows the first user to create an account in the system. It is useful when no collaborator exists yet in the database, or if all accounts were deleted, to regain access to the application.
+- Log out: 
+   - Exit the current session securely.
 
-After signing in, the app will display a department-specific menu:
+### After signing in, the app will display a department-specific menu:
 
 Management:
-- Create and modify contracts
-- Manage collaborators (create, update, delete)
-- Assign support staff to events
+   - Create Collaborator
+   - Modify Collaborator
+   - Delete Collaborator
+   - View customers
+   - Read customer
+   - View Contracts
+   - Read contract
+   - Create Contract
+   - Modify contract
+   - View events
+   - Read event
+   - Assign support collaborator to event
+   - Log out
 
 Support:
-- View and update your assigned events
+   - View customers
+   - Read customer
+   - View Contracts
+   - Read contract
+   - View events
+   - Read event
+   - Modify event
+   - Display my events
+   - Log out
 
 Sales:
-- Create and modify customers and contracts
-- Create an event for a signed customer
+   - Create customer
+   - View customers
+   - Read customer
+   - Modify customer
+   - View Contracts
+   - Read contract
+   - Filter contracts by status
+   - Filter contracts not fully paid
+   - Modify contract
+   - View events
+   - Read event
+   - Create event
+   - Log out
 
 You can navigate through the menu using the keyboard, and each command will guide you through the required inputs.
 
@@ -157,6 +249,9 @@ The conditional initialization ensures Sentry is never activated during test run
 - Injections are prevented by using SQLAlchemy ORM for all database interactions.
 - Environment variables are used for all sensitive configuration — no secrets are hardcoded.
 - During testing, fake environment variables are injected and Sentry is disabled to ensure no external data leaks.
+
+
+
 
 
 

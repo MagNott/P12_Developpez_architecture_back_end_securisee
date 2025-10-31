@@ -86,7 +86,8 @@ def render_choice_customer(
         console.rule("", style="bold red")
         return
     customer_choices = [
-        f"{customer.id}: {customer.first_name} {customer.last_name} of sales "
+        f"{customer.id}: {customer.company_name} - {customer.first_name} "
+        f"{customer.last_name} of sales "
         f"collaborator: {customer.collaborator.first_name} "
         f"{customer.collaborator.last_name}"
         for customer in customers

@@ -1,7 +1,7 @@
-from .user import User
-from .customer import Customer
-from .collaborator import Collaborator
-from .contract import Contract
-from .event import Event
-from .department import Department
-from .status import Status
+from .user import User  # noqa: F401
+from .customer import Customer  # noqa: F401
+from .collaborator import Collaborator  # noqa: F401
+from .contract import Contract  # noqa: F401
+from .event import Event  # noqa: F401
+from .department import Department  # noqa: F401
+from .status import Status  # noqa: F401

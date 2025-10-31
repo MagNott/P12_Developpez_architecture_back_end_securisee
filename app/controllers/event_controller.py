@@ -32,6 +32,13 @@ class EventController:
         self.authenticated_collaborator: Collaborator = self.permission.authenticated_collaborator  # noqa
 
     def view_events(self):
+        """
+        View all events.
+
+        - Requires read permission.
+        - Retrieves all events from the database via SQLAlchemy.
+        - Displays the event list using the appropriate view function.
+        """
         if not self.permission.can_read():
             render_access_denied()
             return
@@ -46,6 +53,16 @@ class EventController:
             Session.remove()
 
     def create_event(self):
+        """
+        Create a new event.
+
+        - Verifies if the authenticated user has permission to create events.
+        - Filters only signed contracts belonging to the authenticated
+        collaborator.
+        - Prompts for event details using an interactive form.
+        - Creates and stores the event in the database via SQLAlchemy.
+        - Displays success or error message based on the result.
+        """
         if not self.permission.can_create_event():
             render_access_denied()
             return
@@ -88,6 +105,15 @@ class EventController:
             Session.remove()
 
     def read_event(self):
+        """
+        Read event details.
+
+        - Requires read permission.
+        - Retrieves all events from the database via SQLAlchemy.
+        - Prompts the user to select an event to view.
+        - Displays the details of the selected event using the appropriate
+        view function.
+        """
         if not self.permission.can_read():
             render_access_denied()
             return
@@ -119,6 +145,16 @@ class EventController:
             Session.remove()
 
     def modify_event(self):
+        """
+        Modify an existing event.
+
+        - Verifies if the authenticated user has permission to modify events.
+        - Retrieves events assigned to the authenticated collaborator.
+        - Prompts the user to select an event to modify.
+        - Collects updated event details using an interactive form.
+        - Applies the updates to the event in the database via SQLAlchemy.
+        - Displays success or error message based on the result.
+        """
         if not self.permission.can_modify_event():
             render_access_denied()
             return
@@ -170,6 +206,19 @@ class EventController:
             Session.remove()
 
     def assign_support_collaborator_to_event(self):
+        """
+        Assign a support collaborator to an event.
+
+        - Verifies if the authenticated user has permission to assign support
+        collaborators to events.
+        - Retrieves events without assigned support collaborators.
+        - Prompts the user to select an event to assign a collaborator to.
+        - Retrieves support collaborators from the database.
+        - Prompts the user to select a support collaborator to assign.
+        - Updates the event with the selected collaborator in the database via
+        SQLAlchemy.
+        - Displays success or error message based on the result.
+        """
         if not self.permission.can_assign_support_collaborator_to_event():
             render_access_denied()
             return
@@ -226,6 +275,15 @@ class EventController:
             Session.remove()
 
     def display_my_events(self):
+        """
+        Display events assigned to the authenticated user.
+
+        - Verifies if the authenticated user has permission to view their
+        events.
+        - Retrieves events assigned to the authenticated collaborator from the
+        database via SQLAlchemy.
+        - Displays the list of events using the appropriate view function.
+        """
         if not self.permission.can_display_my_events():
             render_access_denied()
             return

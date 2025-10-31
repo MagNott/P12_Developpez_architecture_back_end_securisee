@@ -4,7 +4,8 @@ from app.validators.event_validator import (
     is_valid_attendees,
     is_valid_date,
     is_valid_location,
-    is_valid_notes
+    is_valid_notes,
+    is_valid_start_date
 )
 from app.views.common_input_view import ask_if_update
 
@@ -44,10 +45,11 @@ def ask_notes() -> str:
 def ask_start_date() -> str:
     while True:
         start_date = console.input("Enter event start date (YYYY-MM-DD): ")
-        if is_valid_date(start_date):
+        if is_valid_start_date(start_date):
             return start_date
         console.print(
-            "[red]Start date must be a valid date in YYYY-MM-DD format.[/red]"
+            "[red]Start date must be a valid date in YYYY-MM-DD format and "
+            "cannot be in the past.[/red]"
         )
 
 

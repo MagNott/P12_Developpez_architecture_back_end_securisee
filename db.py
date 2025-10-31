@@ -1,10 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
+import os
 
-# if os.getenv("ENV_TEST") == "true":
-#     DATABASE_URL = "sqlite:///:memory:"
-# else:
-DATABASE_URL = "postgresql+psycopg2://p12_user:mdpp12@localhost:5432/p12_db"
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environnement variable is not set.")
 
 engine = create_engine(DATABASE_URL)
 engine.connect()

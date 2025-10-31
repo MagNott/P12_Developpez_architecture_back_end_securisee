@@ -25,6 +25,12 @@ class CustomerController:
         self.authenticated_collaborator: Collaborator = self.permission.authenticated_collaborator  # noqa: E501
 
     def view_customers(self):
+        """
+        View all customers.
+        - Verifies if the authenticated user has permission to read customers.
+        - Retrieves all customers from the database via SQLAlchemy.
+        - Displays the customer list using the appropriate view function.
+        """
         if not self.permission.can_read():
             render_access_denied()
             return
@@ -43,6 +49,14 @@ class CustomerController:
             Session.remove()
 
     def create_customer(self):
+        """
+        Create a new customer.
+
+        - Requires permission to create customers.
+        - Prompts the user for customer details.
+        - Adds the new customer to the database with current timestamps.
+        - Displays success or error messages.
+        """
         if not self.permission.can_create_customer():
             render_access_denied()
             return
@@ -75,6 +89,14 @@ class CustomerController:
             Session.remove()
 
     def read_customer(self):
+        """
+        Read a customer's information.
+        - Verifies if the authenticated user has permission to read customers.
+        - Prompts for the customer ID using an interactive form.
+        - Retrieves the customer from the database via SQLAlchemy.
+        - Displays the customer information using the appropriate view
+        function.
+        """
         if not self.permission.can_read():
             render_access_denied()
             return
@@ -106,6 +128,18 @@ class CustomerController:
             Session.remove()
 
     def modify_customer(self):
+        """
+        Modify a customer's information.
+        - Verifies if the authenticated user has permission to modify
+        customers.
+        - Filters customers linked to the authenticated commercial user.
+        - Prompts to select and edit one of their customers.
+        - Retrieves the customer from the database via SQLAlchemy.
+        - Prompts for new customer information using an interactive form.
+        - Applies updates and sets a new 'last_update' timestamp.
+        - Updates the customer in the database and displays success or error
+        messages.
+        """
         if not self.permission.can_modify_customer():
             render_access_denied()
             return

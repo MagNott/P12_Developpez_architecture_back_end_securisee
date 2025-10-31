@@ -12,6 +12,13 @@ def is_valid_last_name(last_name) -> bool:
 def is_valid_email(email: str) -> bool:
     email = email.strip()
     pattern = r"^[\w\.-]+@[\w\.-]+\.\w{2,}$"
+    # how this regex works:
+    # ^[\w\.-]+ → start with one or more word characters, dots, or hyphens
+    # @ → followed by an '@' symbol
+    # [\w\.-]+ → followed by one or more word characters, dots, or hyphens
+    # \. → followed by a dot
+    # \w{2,} → followed by at least two word characters (the domain)
+    # $ → end of the string
     return re.match(pattern, email) is not None
 
 
@@ -29,7 +36,6 @@ def is_valid_password_complexity(password: str) -> bool:
     pattern = re.compile(
         r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{12,}$'  # noqa: E501
     )
-
     # How this regex works:
     # (?=.*[a-z]) → at least one lowercase letter
     # (?=.*[A-Z]) → at least one uppercase letter

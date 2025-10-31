@@ -1,7 +1,9 @@
+import os
 from app.utils.security_utils import hash_anonymize
 from app.views.collaborator_view import (
     get_signup_info,
     show_cannot_delete_self,
+    show_log_out_success,
     show_signin_success,
     show_signin_error,
     show_signup_success,
@@ -10,6 +12,8 @@ from app.views.collaborator_view import (
     render_choice_collaborator,
     show_delete_error,
     show_delete_success,
+    show_modified_error,
+    show_modified_success
 )
 from app.models.collaborator import Collaborator
 from app.utils.password_utils import hash_password
@@ -35,6 +39,15 @@ class CollaboratorController:
         self.authenticated_collaborator: Collaborator = self.permission.authenticated_collaborator  # noqa: E501
 
     def signup(self):
+        """
+        Sign up a new collaborator.
+        Create a new collaborator account for self-signup.
+        - Prompts for input data using an interactive form.
+        - Hashes the password before storing it.
+        - Stores the new collaborator in the database via SQLAlchemy.
+        - Logs the creation action anonymously to Sentry for traceability.
+        - Displays success or error message based on the result.
+        """
         session = Session()
 
         try:
@@ -72,6 +85,13 @@ class CollaboratorController:
             Session.remove()
 
     def signin(self):
+        """
+        Sign in an existing collaborator.
+        - Prompts for login and password using an interactive form.
+        - Verifies the credentials against the database via SQLAlchemy.
+        - Generates and saves a session token upon successful authentication.
+        - Displays success or error message based on the result.
+        """
         session = Session()
 
         try:
@@ -101,9 +121,31 @@ class CollaboratorController:
             Session.remove()
 
     def logout(self):
-        print("Log out function called")
+        """
+        Log out the current collaborator.
+        - Deletes the session token file to log out the user.
+        - Displays a success message upon completion.
+        """
+        if os.path.exists(".session"):
+            os.remove(".session")
+        show_log_out_success()
 
     def create_collaborator(self):
+        """
+        Create a new collaborator account.
+
+        - Verifies if the authenticated user has permission to create
+        collaborators.
+        - Prompts for input data using an interactive form.
+        - Hashes the password before storing it.
+        - Stores the new collaborator in the database via SQLAlchemy.
+        - Logs the creation action anonymously to Sentry for traceability.
+        - Displays success or error message based on the result.
+
+        This function uses environment variables for security
+        (PEPPER for hashing), and relies on permissions and department-based
+        access control.
+        """
         if not self.permission.can_create_collaborator():
             render_access_denied()
             return
@@ -148,6 +190,21 @@ class CollaboratorController:
             Session.remove()
 
     def modify_collaborator(self):
+        """
+        Modify an existing collaborator's information.
+
+        - Verifies if the authenticated user has permission to modify
+        collaborators.
+        - Prompts for input data using an interactive form.
+        - Hashes the password before storing it if modified.
+        - Updates the collaborator in the database via SQLAlchemy.
+        - Logs the modification action anonymously to Sentry for traceability.
+        - Displays success or error message based on the result.
+
+        This function uses environment variables for security
+        (PEPPER for hashing), and relies on permissions and department-based
+        access control.
+        """
         if not self.permission.can_modify_collaborator():
             render_access_denied()
             return
@@ -197,15 +254,31 @@ class CollaboratorController:
                     f"{id_collaborator_anonimized_modified}"
                     f" by {id_collaborator_anonimized}."
                 )
-                show_signup_success()
+                show_modified_success()
             else:
-                show_signup_error()
+                show_modified_error()
 
         finally:
             session.close()
             Session.remove()
 
     def delete_collaborator(self):
+        """
+        Delete an existing collaborator.
+
+        - Verifies if the authenticated user has permission to delete
+        collaborators.
+        - Displays a list of collaborators to choose from.
+        - Prevents self-deletion.
+        - Asks for confirmation before deletion.
+        - Deletes the collaborator from the database via SQLAlchemy.
+        - Logs the deletion action anonymously to Sentry for traceability.
+        - Displays success or error message based on the result.
+
+        This function uses environment variables for security
+        (PEPPER for hashing), and relies on permissions and department-based
+        access control.
+        """
         if not self.permission.can_delete_collaborator():
             render_access_denied()
             return

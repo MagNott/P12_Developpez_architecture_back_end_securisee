@@ -35,6 +35,13 @@ class ContractController:
         self.authenticated_collaborator: Collaborator = self.permission.authenticated_collaborator  # noqa: E501
 
     def view_contracts(self):
+        """
+        View all contracts.
+
+        - Requires read permission.
+        - Retrieves all contracts from the database via SQLAlchemy.
+        - Displays the contract list using the appropriate view function.
+        """
         if not self.permission.can_read():
             render_access_denied()
             return
@@ -53,6 +60,16 @@ class ContractController:
             Session.remove()
 
     def create_contract(self):
+        """
+        Create a new contract.
+
+        - Requires create permission.
+        - Prompts for contract details using an interactive form.
+        - Prompts to select a customer from the list.
+        - Retrieves the "Unsigned" status from the database.
+        - Creates and stores the contract in the database via SQLAlchemy.
+        - Displays a success or error message based on the result.
+        """
         if not self.permission.can_create_contract():
             render_access_denied()
             return
@@ -113,6 +130,14 @@ class ContractController:
             Session.remove()
 
     def read_contract(self):
+        """
+        Read a contract's details.
+
+        - Requires read permission.
+        - Retrieves all contracts from the database via SQLAlchemy.
+        - Prompts the user to select a contract.
+        - Displays the details of the selected contract.
+        """
         if not self.permission.can_read():
             render_access_denied()
             return
@@ -147,6 +172,21 @@ class ContractController:
             Session.remove()
 
     def modify_contract(self):
+        """
+        Modify an existing contract.
+
+        - Requires modify permission.
+        - Retrieves 2 lists of contracts according to the department
+        collaborator.
+            - If sales, only contracts of their own customers.
+            - If management, all contracts.
+        - Prompts the user to select a contract to modify.
+        - Collects updated contract details using an interactive form.
+        - Applies the updates to the contract in the database via SQLAlchemy.
+        - If the status is changed to "Signed", logs the action with anonymized
+        IDs to Sentry.
+        - Displays success or error message based on the result.
+        """
         if not self.permission.can_modify_contract():
             render_access_denied()
             return
@@ -239,8 +279,15 @@ class ContractController:
 
     def filter_contracts_by_status(self):
         """
-        Allows the user to view all contracts filtered by a selected status.
-        Accessible to sales authenticated collaborators.
+        View all contracts filtered by a selected status.
+
+        - Requires filter permission, accessible to sales authenticated
+        collaborators.
+        - Prompts the user to select a status from the list.
+        - Retrieves contracts with the selected status and belonging to
+        the authenticated collaborator's customers.
+        - Displays the filtered contract list using the appropriate view
+        function.
         """
         if not self.permission.can_filter_contracts_by_status():
             render_access_denied()
@@ -260,12 +307,6 @@ class ContractController:
                 return
 
             status_id = int(status_choice.split(":")[0])
-
-            # filtered_contracts = (
-            #     session.query(Contract)
-            #     .filter(Contract.status_id == status_id)
-            #     .all()
-            # )
 
             filtered_contracts = (
                 session.query(Contract)
@@ -288,8 +329,13 @@ class ContractController:
 
     def filter_contracts_not_fully_paid(self):
         """
-        Allows the user to view all contracts that are not fully paid.
-        Accessible to sales authenticated collaborators.
+        View all contracts that are not fully paid.
+
+        - Required filter permission, Accessible to sales authenticated
+        collaborators.
+        - Retrieves contracts with an an unpaid balance and belonging
+        to the authenticated collaborator's customers.
+        - Displays the filtered contract list.
         """
         if not self.permission.can_filter_contracts_not_fully_paid():
             render_access_denied()
@@ -298,12 +344,6 @@ class ContractController:
         session = Session()
 
         try:
-            # filtered_contracts = (
-            #     session.query(Contract)
-            #     .filter(Contract.amount_due > 0)
-            #     .all()
-            # )
-
             filtered_contracts = (
                 session.query(Contract)
                 .join(Contract.customer)

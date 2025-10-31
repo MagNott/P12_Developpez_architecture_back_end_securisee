@@ -14,6 +14,17 @@ def is_valid_notes(notes) -> bool:
     return bool(notes.strip()) and len(notes) <= 500
 
 
+def is_valid_start_date(date_str) -> bool:
+    try:
+        object_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        now = datetime.now().date()
+        if object_date < now:
+            return False
+        return True
+    except ValueError:
+        return False
+
+
 def is_valid_date(date_str) -> bool:
     try:
         datetime.strptime(date_str, "%Y-%m-%d")

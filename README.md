@@ -251,8 +251,10 @@ The conditional initialization ensures Sentry is never activated during test run
 - During testing, fake environment variables are injected and Sentry is disabled to ensure no external data leaks.
 
 
+## Schema Diagram
+Here is the database schema diagram illustrating the relationships between the main entities:
 
-
+![Database Schema](DOCS/Schema_de_classe_P12.png)
 
 
 ## Author
